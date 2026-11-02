@@ -1,0 +1,90 @@
+name: portal-dados
+
+services:
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+
+    container_name: portal-dados-api
+    restart: unless-stopped
+
+    ports:
+      - "127.0.0.1:8000:8000"
+
+    env_file:
+      - ./server/.env
+
+    environment:
+      DB_HOST: host.docker.internal
+      S3_ENDPOINT: http://rustfs:9000
+
+    volumes:
+      - ./server:/app
+
+    command:
+      - uvicorn
+      - app.main:app
+      - --host
+      - 0.0.0.0
+      - --port
+      - "8000"
+      - --reload
+
+    depends_on:
+      - rustfs
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+
+    container_name: portal-dados-frontend
+    restart: unless-stopped
+
+    ports:
+      - "127.0.0.1:5173:5173"
+
+    volumes:
+      - ./frontend:/app
+      - frontend_node_modules:/app/node_modules
+
+    environment:
+      CHOKIDAR_USEPOLLING: "true"
+
+    command:
+      - npm
+      - run
+      - dev
+      - --
+      - --host
+      - 0.0.0.0
+
+    depends_on:
+      - server
+
+  rustfs:
+    image: rustfs/rustfs:latest
+    container_name: portal-dados-rustfs
+    restart: unless-stopped
+
+    ports:
+      - "127.0.0.1:9000:9000"
+      - "127.0.0.1:9001:9001"
+
+    env_file:
+      - ./storage/.env
+
+    environment:
+      RUSTFS_ADDRESS: ":9000"
+      RUSTFS_CONSOLE_ADDRESS: ":9001"
+      RUSTFS_CONSOLE_ENABLE: "true"
+
+    volumes:
+      - rustfs_data:/data
+
+    command: ["/data"]
+
+volumes:
+  frontend_node_modules:
+  rustfs_data:

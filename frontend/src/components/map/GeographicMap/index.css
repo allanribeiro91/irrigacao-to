@@ -1,0 +1,229 @@
+.geographic-map {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  background: var(--color-background);
+}
+
+.geographic-map__container {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  background: var(--color-neutral-900);
+}
+
+/* Controles gerais do Leaflet */
+
+.geographic-map .leaflet-control {
+  font-family:
+    Inter,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+}
+
+.geographic-map .leaflet-bar {
+  overflow: hidden;
+  background: rgba(13, 25, 35, 0.94);
+  border: 1px solid var(--color-border) !important;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+  backdrop-filter: blur(12px);
+}
+
+.geographic-map .leaflet-bar a {
+  display: grid;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  color: var(--color-text-secondary);
+  line-height: 36px;
+  background: transparent;
+  border-bottom-color: var(--color-border-subtle);
+  transition:
+    color var(--transition-fast),
+    background var(--transition-fast);
+}
+
+.geographic-map .leaflet-bar a:hover {
+  color: var(--color-text-primary);
+  background: var(--color-surface-hover);
+}
+
+.geographic-map .leaflet-bar a:last-child {
+  border-bottom: 0;
+}
+
+.geographic-map .leaflet-bar a.leaflet-disabled {
+  color: var(--color-text-disabled);
+  background: transparent;
+}
+
+/* Seletor de mapas-base */
+
+.geographic-map .leaflet-control-layers {
+  min-width: 42px;
+  min-height: 42px;
+  color: var(--color-text-secondary);
+  background: rgba(13, 25, 35, 0.95);
+  border: 1px solid var(--color-border) !important;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+  backdrop-filter: blur(12px);
+}
+
+.geographic-map .leaflet-control-layers-toggle {
+  width: 40px;
+  height: 40px;
+  background-size: 20px 20px;
+  filter: invert(75%) sepia(20%) saturate(772%) hue-rotate(154deg)
+    brightness(97%);
+}
+
+.geographic-map .leaflet-control-layers-expanded {
+  min-width: 180px;
+  padding: 11px 13px;
+}
+
+.geographic-map .leaflet-control-layers-list {
+  font-size: 0.78rem;
+}
+
+.geographic-map .leaflet-control-layers-base {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.geographic-map .leaflet-control-layers-base label {
+  display: block;
+  padding: 7px 8px;
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  transition: background var(--transition-fast);
+}
+
+.geographic-map .leaflet-control-layers-base label:hover {
+  background: var(--color-surface-hover);
+}
+
+.geographic-map .leaflet-control-layers-selector {
+  margin-right: 7px;
+  accent-color: var(--color-primary);
+}
+
+/* Escala */
+
+.geographic-map .leaflet-control-scale-line {
+  color: var(--color-text-secondary);
+  font-size: 0.62rem;
+  background: rgba(7, 18, 27, 0.76);
+  border-color: var(--color-text-muted);
+  border-top: 0;
+  border-radius: 0 0 var(--radius-xs) var(--radius-xs);
+  text-shadow: none;
+  backdrop-filter: blur(8px);
+}
+
+/* Créditos obrigatórios */
+
+.geographic-map .leaflet-control-attribution {
+  padding: 3px 7px;
+  color: var(--color-text-muted);
+  font-size: 0.59rem;
+  background: rgba(7, 18, 27, 0.76);
+  backdrop-filter: blur(8px);
+}
+
+.geographic-map .leaflet-control-attribution a {
+  color: var(--color-blue-200);
+}
+
+/* Ajuste das posições */
+
+.geographic-map .leaflet-top.leaflet-right {
+  display: flex;
+  padding: 12px;
+  align-items: flex-end;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.geographic-map .leaflet-top.leaflet-right .leaflet-control {
+  margin: 0;
+}
+
+.geographic-map .leaflet-bottom.leaflet-left {
+  padding: 0 0 10px 10px;
+}
+
+.geographic-map .leaflet-bottom.leaflet-left .leaflet-control {
+  margin: 0;
+}
+
+@media (max-width: 680px) {
+  .geographic-map .leaflet-control-attribution {
+    max-width: 70vw;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+.geographic-map__layer-status {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  z-index: 500;
+  max-width: min(320px, calc(100% - 100px));
+  padding: 12px 16px;
+  color: var(--color-text-primary);
+  font-size: 0.875rem;
+  line-height: 1.5;
+  background: rgba(13, 25, 35, 0.95);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+}
+
+.geographic-map__layer-status[role="alert"] {
+  color: #fca5a5;
+}
+
+.geographic-map__region-popup {
+  min-width: 190px;
+  font-size: 0.875rem;
+  line-height: 1.7;
+}
+
+.geographic-map__region-popup strong {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 1rem;
+}
+
+.geographic-map .leaflet-interactive:focus:not(:focus-visible) {
+  outline: none;
+}
+
+.geographic-map .leaflet-overlay-pane path.leaflet-interactive {
+  transition: filter 150ms ease;
+}
+
+.geographic-map .leaflet-overlay-pane path.leaflet-interactive:hover {
+  filter: brightness(0.8);
+}
+
+.geographic-map .leaflet-tooltip.geographic-map__tooltip {
+  padding: 8px 12px;
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.4;
+  border-radius: 6px;
+}

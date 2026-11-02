@@ -1,0 +1,166 @@
+:root {
+  /* ======================================================
+     CORES DA MARCA
+     ====================================================== */
+
+  /* Azul — água, tecnologia e inteligência territorial */
+  --color-blue-50: #e9f7ff;
+  --color-blue-100: #ccecff;
+  --color-blue-200: #99d9f5;
+  --color-blue-300: #5fc0e8;
+  --color-blue-400: #25a5d6;
+  --color-blue-500: #0788bd;
+  --color-blue-600: #056d9d;
+  --color-blue-700: #07587e;
+  --color-blue-800: #0a4766;
+  --color-blue-900: #0a3952;
+  --color-blue-950: #062638;
+
+  /* Verde — agricultura, vegetação e sustentabilidade */
+  --color-green-50: #f0f9e8;
+  --color-green-100: #dff1cf;
+  --color-green-200: #bde39e;
+  --color-green-300: #91cf66;
+  --color-green-400: #67b83a;
+  --color-green-500: #459c21;
+  --color-green-600: #337d17;
+  --color-green-700: #296016;
+  --color-green-800: #254d18;
+  --color-green-900: #203f18;
+  --color-green-950: #0e2308;
+
+  /* Amarelo — sol, produção e atenção */
+  --color-yellow-50: #fff9e5;
+  --color-yellow-100: #fff0b8;
+  --color-yellow-200: #ffe27a;
+  --color-yellow-300: #ffcd3b;
+  --color-yellow-400: #f7b515;
+  --color-yellow-500: #dc9305;
+  --color-yellow-600: #b86d00;
+  --color-yellow-700: #934e04;
+  --color-yellow-800: #793d0b;
+  --color-yellow-900: #66330f;
+  --color-yellow-950: #3b1905;
+
+  /* Marrom — solo, território e produção rural */
+  --color-brown-50: #faf5ee;
+  --color-brown-100: #efe4d3;
+  --color-brown-200: #dec5a3;
+  --color-brown-300: #c9a06f;
+  --color-brown-400: #b68147;
+  --color-brown-500: #9f6938;
+  --color-brown-600: #80502d;
+  --color-brown-700: #67402a;
+  --color-brown-800: #553628;
+  --color-brown-900: #482f24;
+  --color-brown-950: #29170f;
+
+  /* ======================================================
+     NEUTROS AZULADOS
+     ====================================================== */
+
+  --color-neutral-0: #ffffff;
+  --color-neutral-50: #f4f7fa;
+  --color-neutral-100: #e5ebf0;
+  --color-neutral-200: #cbd5df;
+  --color-neutral-300: #aab8c5;
+  --color-neutral-400: #7e91a3;
+  --color-neutral-500: #607487;
+  --color-neutral-600: #485b6d;
+  --color-neutral-700: #354655;
+  --color-neutral-800: #22313e;
+  --color-neutral-850: #192834;
+  --color-neutral-900: #111f2a;
+  --color-neutral-925: #0d1923;
+  --color-neutral-950: #07121b;
+  --color-neutral-1000: #030a10;
+
+  /* ======================================================
+     TOKENS SEMÂNTICOS DO TEMA
+     ====================================================== */
+
+  /* Fundos */
+  --color-background: var(--color-neutral-950);
+  --color-background-deep: var(--color-neutral-1000);
+  --color-surface: var(--color-neutral-925);
+  --color-surface-raised: var(--color-neutral-900);
+  --color-surface-hover: var(--color-neutral-850);
+  --color-surface-selected: rgba(7, 136, 189, 0.16);
+
+  /* Bordas */
+  --color-border-subtle: rgba(170, 184, 197, 0.12);
+  --color-border: rgba(170, 184, 197, 0.2);
+  --color-border-strong: rgba(170, 184, 197, 0.34);
+
+  /* Textos */
+  --color-text-primary: #f3f7fa;
+  --color-text-secondary: #b8c5cf;
+  --color-text-muted: #7e91a3;
+  --color-text-disabled: #536575;
+  --color-text-inverse: #07121b;
+
+  /* Cor primária */
+  --color-primary: var(--color-blue-400);
+  --color-primary-hover: var(--color-blue-300);
+  --color-primary-active: var(--color-blue-500);
+  --color-primary-subtle: rgba(37, 165, 214, 0.14);
+  --color-primary-border: rgba(37, 165, 214, 0.45);
+
+  /* Cor secundária */
+  --color-secondary: var(--color-green-400);
+  --color-secondary-hover: var(--color-green-300);
+  --color-secondary-active: var(--color-green-500);
+  --color-secondary-subtle: rgba(103, 184, 58, 0.14);
+  --color-secondary-border: rgba(103, 184, 58, 0.42);
+
+  /* Estados */
+  --color-success: var(--color-green-400);
+  --color-success-subtle: rgba(103, 184, 58, 0.14);
+
+  --color-warning: var(--color-yellow-400);
+  --color-warning-subtle: rgba(247, 181, 21, 0.14);
+
+  --color-earth: var(--color-brown-400);
+  --color-earth-subtle: rgba(182, 129, 71, 0.14);
+
+  --color-danger: #ef6464;
+  --color-danger-hover: #f27d7d;
+  --color-danger-subtle: rgba(239, 100, 100, 0.14);
+
+  --color-info: var(--color-blue-300);
+  --color-focus: var(--color-blue-300);
+
+  /* ======================================================
+     DIMENSÕES E EFEITOS
+     ====================================================== */
+
+  --topbar-height: 64px;
+  --sidebar-width: 76px;
+  --sidebar-expanded-width: 240px;
+
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+  --radius-pill: 999px;
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.24);
+
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.24);
+
+  --shadow-lg: 0 18px 48px rgba(0, 0, 0, 0.32);
+
+  --transition-fast: 120ms ease;
+  --transition-base: 180ms ease;
+  --transition-slow: 280ms ease;
+
+  /* Camadas da interface */
+  --z-index-base: 1;
+  --z-index-map-control: 100;
+  --z-index-sidebar: 200;
+  --z-index-topbar: 300;
+  --z-index-dropdown: 400;
+  --z-index-modal: 500;
+  --z-index-toast: 600;
+}

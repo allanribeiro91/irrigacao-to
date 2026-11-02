@@ -1,0 +1,24 @@
+
+# Ambientes Python
+venv/
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Segredos e variáveis
+.env
+.env.*
+!.env.example
+
+# Git e IDE
+.git/
+.vscode/
+.idea/
+
+# Arquivos locais
+*.log
+.DS_Store
