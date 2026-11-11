@@ -1,6 +1,6 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, Response, status
+from fastapi import APIRouter, Depends, Query, Response, status
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
@@ -97,4 +97,36 @@ def delete(
 
     return Response(
         status_code=status.HTTP_204_NO_CONTENT,
+    )
+
+
+@router.get(
+    "",
+    response_model=list[CatalogoDadoResponse],
+)
+def get_all(
+    db: DatabaseSession,
+    usuario_atual: UsuarioAtual,
+    offset: int = Query(default=0, ge=0),
+    limit: int = Query(default=50, ge=1, le=100),
+):
+    return CatalogoDadoService.get_all(
+        db=db,
+        offset=offset,
+        limit=limit,
+    )
+
+
+@router.get(
+    "/{catalogo_id}",
+    response_model=CatalogoDadoResponse,
+)
+def get_by_id(
+    catalogo_id: int,
+    db: DatabaseSession,
+    usuario_atual: UsuarioAtual,
+):
+    return CatalogoDadoService.get_by_id(
+        db=db,
+        catalogo_id=catalogo_id,
     )

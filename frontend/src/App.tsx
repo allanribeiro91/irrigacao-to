@@ -10,6 +10,7 @@ import { GeoPage } from "./pages/portal/GeoPage";
 import { IndicatorsPage } from "./pages/portal/IndicatorsPage";
 import { ReportsPage } from "./pages/portal/ReportsPage";
 import { UserPage } from "./pages/portal/UserPage";
+import { EditCatalog } from "./pages/portal/CatalogPage/EditCatalog";
 
 function App() {
   return (
@@ -26,6 +27,8 @@ function App() {
         <Route path="paineis" element={<DashboardsPage />} />
         <Route path="indicadores" element={<IndicatorsPage />} />
         <Route path="catalogo" element={<CatalogPage />} />
+        <Route path="catalogo/novo" element={<EditCatalog />} />
+        <Route path="catalogo/:id/editar" element={<EditCatalog />} />
         <Route path="relatorios" element={<ReportsPage />} />
         <Route path="usuario" element={<UserPage />} />
 

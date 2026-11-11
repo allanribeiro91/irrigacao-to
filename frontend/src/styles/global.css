@@ -59,8 +59,8 @@ a:hover {
 }
 
 ::selection {
-  color: var(--color-text-primary);
-  background: rgba(37, 165, 214, 0.32);
+  color: #243747;
+  background: #ccecff;
 }
 
 :focus-visible {
@@ -74,15 +74,15 @@ a:hover {
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--color-background);
+  background: #f8fcfe;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--color-neutral-700);
-  border: 2px solid var(--color-background);
-  border-radius: var(--radius-pill);
+  background: #cbdce7;
+  border: 2px solid #f8fcfe;
+  border-radius: 999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--color-neutral-600);
+  background: #aab8c5;
 }

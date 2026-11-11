@@ -95,3 +95,47 @@ class CatalogoDadoService:
         catalogo.DT_ATUALIZACAO = datetime.now(timezone.utc)
 
         db.commit()
+
+    
+    @staticmethod
+    def get_all(
+        db: Session,
+        offset: int = 0,
+        limit: int = 50,
+    ) -> list[CatalogoDado]:
+        stmt = (
+            select(CatalogoDado)
+            .where(
+                CatalogoDado.ST_REGISTRO_ATIVO
+                == StatusAtivoInativoBloqueado.ATIVO
+            )
+            .order_by(
+                CatalogoDado.CO_SEQ_CATALOGO_DADO.desc()
+            )
+            .offset(offset)
+            .limit(limit)
+        )
+
+        return list(db.scalars(stmt).all())
+
+    @staticmethod
+    def get_by_id(
+        db: Session,
+        catalogo_id: int,
+    ) -> CatalogoDado:
+        catalogo = db.scalar(
+            select(CatalogoDado).where(
+                CatalogoDado.CO_SEQ_CATALOGO_DADO
+                == catalogo_id,
+                CatalogoDado.ST_REGISTRO_ATIVO
+                == StatusAtivoInativoBloqueado.ATIVO,
+            )
+        )
+
+        if catalogo is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Registro do catálogo não encontrado.",
+            )
+
+        return catalogo

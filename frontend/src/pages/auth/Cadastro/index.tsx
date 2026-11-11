@@ -1,42 +1,29 @@
-import { useMemo, useState, type FormEvent } from "react";
-
+import { useState, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router";
-
 import {
   ArrowLeft,
   ArrowRight,
-  Check,
   Eye,
   EyeOff,
+  IdCard,
   Layers3,
   LockKeyhole,
   Mail,
   Phone,
-  User,
-  BadgeCheck,
+  UserRound,
 } from "lucide-react";
-
-import "./index.css";
 
 import type { CadastroForm } from "./type";
 import { initialForm } from "./type";
 import { criarUsuario } from "./service";
 import { CustomFeedback } from "../../../components/CustomFeedback";
+import { getHttpErrorMessage } from "../../../services/httpClient";
+import { somenteNumeros } from "../../../utils/somenteNumeros";
+import { formatarCpf } from "../../../utils/formatarCpf";
 
-function somenteNumeros(value: string) {
-  return value.replace(/\D/g, "");
-}
+import "./index.css";
 
-function formatarCpf(value: string) {
-  const numeros = somenteNumeros(value).slice(0, 11);
-
-  return numeros
-    .replace(/^(\d{3})(\d)/, "$1.$2")
-    .replace(/^(\d{3})\.(\d{3})(\d)/, "$1.$2.$3")
-    .replace(/\.(\d{3})(\d)/, ".$1-$2");
-}
-
-function formatarCelular(value: string) {
+function formatarCelular(value: string): string {
   const numeros = somenteNumeros(value).slice(0, 11);
 
   if (numeros.length <= 10) {
@@ -52,54 +39,57 @@ function formatarCelular(value: string) {
 
 export function CadastroPage() {
   const navigate = useNavigate();
-
-  const [form, setForm] = useState<CadastroForm>(initialForm);
+  const [form, setForm] = useState<CadastroForm>({ ...initialForm });
   const [cadastroConcluido, setCadastroConcluido] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showPasswordConfirmation, setShowPasswordConfirmation] =
     useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const passwordsMismatch =
+    form.confirmar_senha.length > 0 && form.ds_senha !== form.confirmar_senha;
 
   function updateField<K extends keyof CadastroForm>(
     field: K,
     value: CadastroForm[K],
   ) {
-    setForm((current) => ({
-      ...current,
-      [field]: value,
-    }));
+    setForm((current) => ({ ...current, [field]: value }));
+    if (error) setError(null);
   }
-
-  const passwordsMatch = useMemo(() => {
-    if (!form.ds_senha || !form.confirmar_senha) {
-      return null;
-    }
-
-    return form.ds_senha === form.confirmar_senha;
-  }, [form.ds_senha, form.confirmar_senha]);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (loading) return;
 
     if (form.ds_senha !== form.confirmar_senha) {
+      setError("As senhas informadas não coincidem.");
       return;
     }
 
-    const celular = somenteNumeros(form.ds_celular);
+    if (form.ds_senha.length < 8) {
+      setError("A senha deve conter pelo menos 8 caracteres.");
+      return;
+    }
 
-    const payload = {
-      co_cpf: somenteNumeros(form.co_cpf),
-      no_nome: form.no_nome.trim(),
-      ds_email: form.ds_email.trim(),
-      ds_celular: celular || null,
-      ds_senha: form.ds_senha,
-    };
+    setLoading(true);
+    setError(null);
 
     try {
-      await criarUsuario(payload);
-
+      await criarUsuario({
+        co_cpf: somenteNumeros(form.co_cpf),
+        no_nome: form.no_nome.trim(),
+        ds_email: form.ds_email.trim(),
+        ds_celular: somenteNumeros(form.ds_celular) || null,
+        ds_senha: form.ds_senha,
+      });
       setCadastroConcluido(true);
-    } catch (error) {
-      console.error(error);
+    } catch (err) {
+      setError(
+        getHttpErrorMessage(err, "Não foi possível concluir o cadastro."),
+      );
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -107,7 +97,6 @@ export function CadastroPage() {
     <main className="register-page">
       <div className="register-background" aria-hidden="true">
         <div className="register-background__sun" />
-
         <svg
           className="register-background__terrain"
           viewBox="0 0 1600 900"
@@ -117,22 +106,18 @@ export function CadastroPage() {
             d="M-80 680 C160 560 320 750 560 630 C800 510 970 660 1190 560 C1380 475 1530 560 1690 470"
             className="register-terrain-line register-terrain-line--blue"
           />
-
           <path
             d="M-90 735 C180 600 345 810 605 680 C840 565 1010 700 1235 610 C1420 535 1540 620 1690 530"
             className="register-terrain-line register-terrain-line--green"
           />
-
           <path
             d="M-90 560 C170 470 350 540 540 430 C710 335 890 390 1060 320 C1240 245 1430 300 1660 210"
             className="register-contour-line"
           />
-
           <path
             d="M-100 610 C180 510 370 590 575 475 C755 375 950 430 1120 360 C1300 290 1470 345 1680 265"
             className="register-contour-line"
           />
-
           <path
             d="M-110 660 C190 565 400 630 610 525 C790 435 980 490 1160 420 C1340 355 1500 405 1690 335"
             className="register-contour-line"
@@ -141,104 +126,44 @@ export function CadastroPage() {
       </div>
 
       <header className="register-header">
-        <Link className="register-brand" to="/">
-          <div className="register-brand__symbol" aria-hidden="true">
-            <Layers3 size={28} strokeWidth={1.8} />
-          </div>
-
-          <div className="register-brand__text">
-            <span>Plano de Desenvolvimento Sustentável</span>
+        <Link className="register-brand" to="/login">
+          <span className="register-brand__symbol" aria-hidden="true">
+            <Layers3 size={27} strokeWidth={1.8} />
+          </span>
+          <span className="register-brand__text">
+            <small>Plano de Desenvolvimento Sustentável</small>
             <strong>Polo de Agricultura Irrigada</strong>
-            <small>Sudoeste do Tocantins</small>
-          </div>
+            <span>Sudoeste do Tocantins</span>
+          </span>
         </Link>
-
-        <Link className="register-header__back" to="/">
+        <Link className="register-header__back" to="/login">
           <ArrowLeft size={16} />
-          Voltar para o acesso
+          Voltar ao login
         </Link>
       </header>
 
-      <section className="register-content">
-        <div className="register-presentation">
-          <span className="register-presentation__eyebrow">
-            Portal de Dados
-          </span>
-
-          <h1>
-            Crie seu acesso à<span> inteligência territorial.</span>
-          </h1>
-
-          <p>
-            Cadastre suas informações para acessar mapas, indicadores, análises
-            territoriais e dados estratégicos do Polo.
-          </p>
-
-          <div className="register-benefits">
-            <div className="register-benefit">
-              <div className="register-benefit__icon">
-                <Check size={16} />
-              </div>
-
-              <div>
-                <strong>Dados integrados</strong>
-                <span>
-                  Informações territoriais, produtivas e socioeconômicas.
-                </span>
-              </div>
-            </div>
-
-            <div className="register-benefit">
-              <div className="register-benefit__icon">
-                <Check size={16} />
-              </div>
-
-              <div>
-                <strong>Ambiente geográfico</strong>
-                <span>
-                  Mapas, camadas e análises espaciais em uma única plataforma.
-                </span>
-              </div>
-            </div>
-
-            <div className="register-benefit">
-              <div className="register-benefit__icon">
-                <Check size={16} />
-              </div>
-
-              <div>
-                <strong>Planejamento territorial</strong>
-                <span>
-                  Informações estruturadas para apoiar decisões e monitoramento.
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <section className="register-card">
+      <section
+        className="register-content"
+        aria-label="Cadastro no Portal de Dados"
+      >
+        <div className="register-card">
           <div className="register-card__accent" />
-
-          <div className="register-card__header">
-            <span>Solicitação de acesso</span>
-
-            <h2>Criar cadastro</h2>
-
-            <p>Preencha seus dados para criar uma conta no Portal de Dados.</p>
-          </div>
+          <header className="register-card__header">
+            <span>PORTAL DE DADOS</span>
+            <h1>Criar cadastro</h1>
+            <p>Informe seus dados para acessar a plataforma.</p>
+          </header>
 
           <form className="register-form" onSubmit={handleSubmit}>
-            <div className="register-field register-field--full">
+            <div className="register-field">
               <label htmlFor="nome">Nome completo</label>
-
               <div className="register-input">
-                <User size={18} aria-hidden="true" />
-
+                <UserRound size={18} aria-hidden="true" />
                 <input
                   id="nome"
                   name="no_nome"
                   type="text"
-                  placeholder="Informe seu nome completo"
+                  placeholder="Seu nome completo"
                   autoComplete="name"
                   value={form.no_nome}
                   onChange={(event) =>
@@ -252,10 +177,8 @@ export function CadastroPage() {
             <div className="register-form__row">
               <div className="register-field">
                 <label htmlFor="cpf">CPF</label>
-
                 <div className="register-input">
-                  <BadgeCheck size={18} aria-hidden="true" />
-
+                  <IdCard size={18} aria-hidden="true" />
                   <input
                     id="cpf"
                     name="co_cpf"
@@ -267,17 +190,17 @@ export function CadastroPage() {
                     onChange={(event) =>
                       updateField("co_cpf", formatarCpf(event.target.value))
                     }
+                    maxLength={14}
                     required
                   />
                 </div>
               </div>
-
               <div className="register-field">
-                <label htmlFor="celular">Celular</label>
-
+                <label htmlFor="celular">
+                  Celular <span className="register-optional">(opcional)</span>
+                </label>
                 <div className="register-input">
                   <Phone size={18} aria-hidden="true" />
-
                   <input
                     id="celular"
                     name="ds_celular"
@@ -292,18 +215,16 @@ export function CadastroPage() {
                         formatarCelular(event.target.value),
                       )
                     }
-                    required
+                    maxLength={15}
                   />
                 </div>
               </div>
             </div>
 
-            <div className="register-field register-field--full">
+            <div className="register-field">
               <label htmlFor="email">E-mail</label>
-
               <div className="register-input">
                 <Mail size={18} aria-hidden="true" />
-
                 <input
                   id="email"
                   name="ds_email"
@@ -322,73 +243,67 @@ export function CadastroPage() {
             <div className="register-form__row">
               <div className="register-field">
                 <label htmlFor="senha">Senha</label>
-
                 <div className="register-input">
                   <LockKeyhole size={18} aria-hidden="true" />
-
                   <input
                     id="senha"
                     name="ds_senha"
                     type={showPassword ? "text" : "password"}
-                    placeholder="Digite uma senha"
+                    placeholder="Mínimo de 8 caracteres"
                     autoComplete="new-password"
+                    minLength={8}
                     value={form.ds_senha}
                     onChange={(event) =>
                       updateField("ds_senha", event.target.value)
                     }
                     required
                   />
-
                   <button
                     type="button"
                     className="register-input__action"
                     aria-label={
                       showPassword ? "Ocultar senha" : "Mostrar senha"
                     }
-                    onClick={() => setShowPassword((current) => !current)}
+                    aria-pressed={showPassword}
+                    onClick={() => setShowPassword((value) => !value)}
                   >
                     {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                   </button>
                 </div>
               </div>
-
               <div className="register-field">
                 <label htmlFor="confirmar-senha">Confirmar senha</label>
-
                 <div
-                  className={[
-                    "register-input",
-                    passwordsMatch === false ? "register-input--error" : "",
-                    passwordsMatch === true ? "register-input--success" : "",
-                  ]
-                    .filter(Boolean)
-                    .join(" ")}
+                  className={`register-input${passwordsMismatch ? " register-input--error" : ""}`}
                 >
                   <LockKeyhole size={18} aria-hidden="true" />
-
                   <input
                     id="confirmar-senha"
                     name="confirmar_senha"
                     type={showPasswordConfirmation ? "text" : "password"}
-                    placeholder="Repita a senha"
+                    placeholder="Repita sua senha"
                     autoComplete="new-password"
                     value={form.confirmar_senha}
                     onChange={(event) =>
                       updateField("confirmar_senha", event.target.value)
                     }
+                    aria-invalid={passwordsMismatch}
+                    aria-describedby={
+                      passwordsMismatch ? "register-password-error" : undefined
+                    }
                     required
                   />
-
                   <button
                     type="button"
                     className="register-input__action"
                     aria-label={
                       showPasswordConfirmation
-                        ? "Ocultar senha"
-                        : "Mostrar senha"
+                        ? "Ocultar confirmação"
+                        : "Mostrar confirmação"
                     }
+                    aria-pressed={showPasswordConfirmation}
                     onClick={() =>
-                      setShowPasswordConfirmation((current) => !current)
+                      setShowPasswordConfirmation((value) => !value)
                     }
                   >
                     {showPasswordConfirmation ? (
@@ -398,53 +313,38 @@ export function CadastroPage() {
                     )}
                   </button>
                 </div>
-
-                {passwordsMatch === false && (
-                  <span className="register-field__error">
+                {passwordsMismatch && (
+                  <span
+                    className="register-field__error"
+                    id="register-password-error"
+                  >
                     As senhas não coincidem.
-                  </span>
-                )}
-
-                {passwordsMatch === true && (
-                  <span className="register-field__success">
-                    As senhas coincidem.
                   </span>
                 )}
               </div>
             </div>
 
-            <div className="register-password-hint">
-              <span>Sua senha deve conter pelo menos 8 caracteres.</span>
-            </div>
+            {error && (
+              <p className="register-form__error" role="alert">
+                {error}
+              </p>
+            )}
 
             <button
               className="register-submit"
               type="submit"
-              disabled={passwordsMatch === false}
+              disabled={loading || passwordsMismatch}
             >
-              <span>Criar cadastro</span>
-              <ArrowRight size={19} />
+              {loading ? "Cadastrando..." : "Criar cadastro"}
+              {!loading && <ArrowRight size={18} aria-hidden="true" />}
             </button>
           </form>
 
           <div className="register-login">
-            <span>Já possui uma conta?</span>
-            <Link to="/">Entrar</Link>
+            Já possui uma conta? <Link to="/login">Entrar</Link>
           </div>
-        </section>
-      </section>
-
-      <footer className="register-footer">
-        <div>
-          <span>APROEST</span>
-          <i />
-          <span>UFT</span>
-          <i />
-          <span>OPAJE</span>
         </div>
-
-        <span>Desenvolvimento sustentável e inteligência territorial</span>
-      </footer>
+      </section>
 
       <CustomFeedback
         open={cadastroConcluido}
@@ -452,7 +352,7 @@ export function CadastroPage() {
         title="Cadastro realizado com sucesso"
         message="Seu usuário foi criado e já está disponível para acesso. Clique em Ok para ir para a tela de login."
         confirmText="Ok"
-        onConfirm={() => navigate("/")}
+        onConfirm={() => navigate("/login")}
       />
     </main>
   );

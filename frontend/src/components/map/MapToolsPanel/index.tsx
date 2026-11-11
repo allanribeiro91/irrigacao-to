@@ -36,7 +36,7 @@ export function MapToolsPanel({
   onSelectAllLayerFilters,
   onClearLayers,
 }: MapToolsPanelProps) {
-  const [expanded, setExpanded] = useState(true);
+  const [expanded, setExpanded] = useState(false);
   const [search, setSearch] = useState("");
   const [filterSearch, setFilterSearch] = useState("");
   const [collapsedGroups, setCollapsedGroups] = useState<string[]>([]);
