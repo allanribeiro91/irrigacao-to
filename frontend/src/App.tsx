@@ -1,9 +1,12 @@
 import { Navigate, Route, Routes } from "react-router";
 
+import { CENTRAL_PATHS } from "./config/paths";
+
 import { LPortalLayout } from "./layouts/LPortalLayout";
+
 import { LoginPage } from "./pages/auth/LoginPage";
 import { CadastroPage } from "./pages/auth/Cadastro";
-import "./styles/global.css";
+
 import { CatalogPage } from "./pages/portal/CatalogPage";
 import { DashboardsPage } from "./pages/portal/DashboardsPage";
 import { GeoPage } from "./pages/portal/GeoPage";
@@ -12,41 +15,77 @@ import { ReportsPage } from "./pages/portal/ReportsPage";
 import { UserPage } from "./pages/portal/UserPage";
 import { EditCatalog } from "./pages/portal/CatalogPage/EditCatalog";
 
+import "./styles/global.css";
+
+function portalPath(path: string): string {
+  return path.replace(/^\/portal\//, "");
+}
+
 function App() {
   return (
     <Routes>
-      {/* Rotas públicas */}
-      <Route path="/login" element={<LoginPage />} />
-      <Route path="/cadastro" element={<CadastroPage />} />
+      {/* ROTAS PÚBLICAS */}
+      <Route path={CENTRAL_PATHS.LOGIN.path} element={<LoginPage />} />
 
-      {/* Portal de dados */}
+      <Route path={CENTRAL_PATHS.CADASTRO.path} element={<CadastroPage />} />
+
+      {/* PORTAL DE DADOS */}
       <Route path="/portal" element={<LPortalLayout />}>
-        <Route index element={<Navigate to="geografico" replace />} />
+        <Route
+          index
+          element={<Navigate to={CENTRAL_PATHS.GEO.path} replace />}
+        />
 
-        <Route path="geografico" element={<GeoPage />} />
-        <Route path="paineis" element={<DashboardsPage />} />
-        <Route path="indicadores" element={<IndicatorsPage />} />
-        <Route path="catalogo" element={<CatalogPage />} />
-        <Route path="catalogo/novo" element={<EditCatalog />} />
-        <Route path="catalogo/:id/editar" element={<EditCatalog />} />
-        <Route path="relatorios" element={<ReportsPage />} />
-        <Route path="usuario" element={<UserPage />} />
+        <Route
+          path={portalPath(CENTRAL_PATHS.GEO.path)}
+          element={<GeoPage />}
+        />
 
-        <Route path="*" element={<Navigate to="geografico" replace />} />
+        <Route
+          path={portalPath(CENTRAL_PATHS.PAINEIS.path)}
+          element={<DashboardsPage />}
+        />
+
+        <Route
+          path={portalPath(CENTRAL_PATHS.INDICADORES.path)}
+          element={<IndicatorsPage />}
+        />
+
+        <Route
+          path={portalPath(CENTRAL_PATHS.CATALOGO.path)}
+          element={<CatalogPage />}
+        />
+
+        <Route
+          path={portalPath(CENTRAL_PATHS.CATALOGO_NOVO.path)}
+          element={<EditCatalog />}
+        />
+
+        <Route
+          path={portalPath(CENTRAL_PATHS.CATALOGO_EDITAR.path)}
+          element={<EditCatalog />}
+        />
+
+        <Route
+          path={portalPath(CENTRAL_PATHS.RELATORIOS.path)}
+          element={<ReportsPage />}
+        />
+
+        <Route
+          path={portalPath(CENTRAL_PATHS.USUARIO.path)}
+          element={<UserPage />}
+        />
+
+        <Route
+          path="*"
+          element={<Navigate to={CENTRAL_PATHS.GEO.path} replace />}
+        />
       </Route>
 
-      {/*
-        Área administrativa futura:
-
-        <Route path="/admin" element={<LAdminLayout />}>
-          <Route index element={<AdminHomePage />} />
-          <Route path="usuarios" element={<AdminUsersPage />} />
-          <Route path="camadas" element={<AdminLayersPage />} />
-          <Route path="paineis" element={<AdminDashboardsPage />} />
-        </Route>
-      */}
-
-      <Route path="*" element={<Navigate to="/login" replace />} />
+      <Route
+        path="*"
+        element={<Navigate to={CENTRAL_PATHS.LOGIN.path} replace />}
+      />
     </Routes>
   );
 }

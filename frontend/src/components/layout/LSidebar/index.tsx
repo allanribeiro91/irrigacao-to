@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-
+import { CENTRAL_PATHS } from "../../../config/paths";
 import {
   ChartNoAxesCombined,
   Database,
@@ -26,27 +26,27 @@ interface LSidebarProps {
 const navigationItems = [
   {
     label: "Geo",
-    path: "/portal/geografico",
+    path: CENTRAL_PATHS.GEO.path,
     icon: Map,
   },
   {
     label: "Painéis",
-    path: "/portal/paineis",
+    path: CENTRAL_PATHS.PAINEIS.path,
     icon: LayoutDashboard,
   },
   {
     label: "Indicadores",
-    path: "/portal/indicadores",
+    path: CENTRAL_PATHS.INDICADORES.path,
     icon: ChartNoAxesCombined,
   },
   {
     label: "Catálogo",
-    path: "/portal/catalogo",
+    path: CENTRAL_PATHS.CATALOGO.path,
     icon: Database,
   },
   {
     label: "Relatórios",
-    path: "/portal/relatorios",
+    path: CENTRAL_PATHS.RELATORIOS.path,
     icon: FileText,
   },
 ];
@@ -108,7 +108,7 @@ export function LSidebar({ expanded, onToggle }: LSidebarProps) {
 
   function handleMyProfile() {
     setUserMenuOpen(false);
-    navigate("/portal/usuario");
+    navigate(CENTRAL_PATHS.USUARIO.path);
   }
 
   async function handleLogout() {
@@ -124,7 +124,7 @@ export function LSidebar({ expanded, onToggle }: LSidebarProps) {
       logout();
       setUserMenuOpen(false);
       setLoggingOut(false);
-      navigate("/login", { replace: true });
+      navigate(CENTRAL_PATHS.LOGIN.path, { replace: true });
     }
   }
 
