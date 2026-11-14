@@ -1,3 +1,7 @@
+/* ==========================================
+   SIDEBAR - ESTRUTURA PRINCIPAL
+   ========================================== */
+
 .l-sidebar {
   position: relative;
   z-index: var(--z-index-sidebar);
@@ -15,6 +19,8 @@
   border-radius: var(--radius-md);
 
   color: var(--color-text-primary);
+
+  overflow: hidden;
 }
 
 /* ==========================================
@@ -22,82 +28,114 @@
    ========================================== */
 
 .l-sidebar__header {
-  position: relative;
   display: flex;
   align-items: center;
-  justify-content: center;
 
-  min-height: 102px;
-  padding: 18px 12px;
+  flex: 0 0 86px;
+  min-width: 0;
+  padding: 14px 8px;
 
   border-bottom: 1px solid var(--color-border-subtle);
+
+  overflow: hidden;
 }
 
 .l-sidebar__brand {
+  position: relative;
+
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 12px;
+  justify-content: flex-start;
+
+  width: 100%;
   min-width: 0;
+  height: 52px;
+
+  padding: 6px 4px;
+
+  border: 0;
+  border-radius: 8px;
+
+  background: transparent;
+  color: inherit;
+
+  font: inherit;
+  text-align: left;
+
+  cursor: pointer;
+  overflow: hidden;
+
+  transition: background-color 200ms ease;
 }
+
+.l-sidebar__brand:hover {
+  background: var(--color-primary-subtle);
+}
+
+.l-sidebar__brand:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: -2px;
+}
+
+/* Símbolo com posição fixa */
 
 .l-sidebar__brand-symbol {
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-shrink: 0;
 
-  width: 43px;
-  height: 43px;
+  flex: 0 0 40px;
+
+  width: 40px;
+  height: 40px;
 
   background: var(--color-primary-subtle);
-  border-radius: 10px;
+  border-radius: 9px;
   color: var(--color-primary);
 }
 
+/* Texto posicionado independentemente */
+
 .l-sidebar__brand-text {
+  position: absolute;
+  left: 54px;
+
   display: flex;
   flex-direction: column;
   gap: 4px;
-  min-width: 0;
+
+  width: max-content;
+  max-width: calc(100% - 58px);
+
+  opacity: 1;
+  visibility: visible;
+
+  transition:
+    opacity 180ms ease 100ms,
+    visibility 0s;
 }
 
 .l-sidebar__brand-text strong {
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 700;
   white-space: nowrap;
 }
 
 .l-sidebar__brand-text span {
-  font-size: 11px;
+  font-size: 10px;
   color: var(--color-text-muted);
   white-space: nowrap;
 }
 
-.l-sidebar__toggle {
-  position: absolute;
-  right: -11px;
-  bottom: -12px;
-  z-index: 5;
+/* Cabeçalho recolhido */
 
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.l-sidebar--collapsed .l-sidebar__brand-text {
+  opacity: 0;
+  visibility: hidden;
 
-  width: 25px;
-  height: 25px;
-
-  border: 1px solid var(--color-primary);
-  border-radius: 50%;
-
-  background: var(--color-surface);
-  color: var(--color-primary);
-
-  cursor: pointer;
-}
-
-.l-sidebar__toggle:hover {
-  background: var(--color-primary-subtle);
+  transition:
+    opacity 150ms ease,
+    visibility 0s linear 150ms;
 }
 
 /* ==========================================
@@ -108,90 +146,132 @@
   display: flex;
   flex: 1;
   flex-direction: column;
-  gap: 5px;
+  align-items: stretch;
+
+  gap: 6px;
 
   min-height: 0;
-  padding: 26px 10px 12px;
+  padding: 20px 9px 12px;
 
-  overflow-y: auto;
   overflow-x: hidden;
+  overflow-y: auto;
 }
+
+/* ITEM DE NAVEGAÇÃO */
 
 .l-sidebar__item {
   position: relative;
 
   display: flex;
   align-items: center;
-  gap: 13px;
+  justify-content: flex-start;
 
-  min-height: 46px;
-  padding: 11px 14px;
+  flex: 0 0 42px;
 
-  border: 1px solid transparent;
+  width: 100%;
+  min-width: 0;
+  height: 42px;
+
+  padding: 0 11px;
+
+  border: 0;
   border-radius: 8px;
 
-  color: var(--color-text-secondary);
   background: transparent;
+  color: var(--color-text-secondary);
 
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 500;
   text-decoration: none;
+  white-space: nowrap;
+
+  overflow: hidden;
 
   transition:
-    color var(--transition-base),
-    background var(--transition-base),
-    border-color var(--transition-base);
+    background-color 200ms ease,
+    color 200ms ease;
 }
 
-.l-sidebar__item svg {
-  flex-shrink: 0;
+/* Ícone sempre na mesma posição */
+
+.l-sidebar__item > svg {
+  display: block;
+  flex: 0 0 20px;
+
+  width: 20px;
+  height: 20px;
 }
+
+/* Texto independente do ícone */
+
+.l-sidebar__item-label {
+  position: absolute;
+  left: 43px;
+
+  display: block;
+
+  width: max-content;
+  max-width: calc(100% - 48px);
+
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  opacity: 1;
+  visibility: visible;
+
+  pointer-events: none;
+
+  transition:
+    opacity 180ms ease 100ms,
+    visibility 0s;
+}
+
+/* HOVER */
 
 .l-sidebar__item:hover {
   background: var(--color-primary-subtle);
-  color: var(--color-primary-hover);
+  color: var(--color-primary);
 }
+
+/* ITEM ATIVO */
 
 .l-sidebar__item--active,
 .l-sidebar__item--active:hover {
-  color: var(--color-primary);
-  background: var(--color-primary-subtle);
-  border-color: var(--color-primary-border);
-  font-weight: 650;
-}
-
-.l-sidebar__item--active::before {
-  position: absolute;
-  top: 10px;
-  bottom: 10px;
-  left: -11px;
-
-  width: 3px;
-
-  border-radius: 0 3px 3px 0;
   background: var(--color-primary);
+  color: #ffffff;
 
-  content: "";
+  font-weight: 600;
 }
 
-.l-sidebar__item-label {
-  min-width: 0;
-  white-space: nowrap;
+.l-sidebar__item--active > svg {
+  color: #ffffff;
 }
 
-/* SIDEBAR COMPACTA */
+/* FOCO */
 
-.l-sidebar--collapsed .l-sidebar__item {
-  justify-content: center;
-  padding: 11px;
+.l-sidebar__item:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: -2px;
 }
+
+/* ==========================================
+   SIDEBAR RECOLHIDA
+   ========================================== */
+
+/* Não alteramos justify-content,
+   padding ou largura dos ícones.
+
+   A sidebar diminui pelo grid do LMainBody,
+   enquanto os ícones mantêm sua posição. */
 
 .l-sidebar--collapsed .l-sidebar__item-label {
-  display: none;
-}
+  opacity: 0;
+  visibility: hidden;
 
-.l-sidebar--collapsed .l-sidebar__brand {
-  justify-content: center;
+  transition:
+    opacity 150ms ease,
+    visibility 0s linear 150ms;
 }
 
 /* ==========================================
@@ -200,32 +280,48 @@
 
 .l-sidebar__footer {
   position: relative;
-  padding: 12px 10px;
+  flex-shrink: 0;
+
+  padding: 10px 8px;
 
   border-top: 1px solid var(--color-border-subtle);
 }
 
 .l-sidebar__user-container {
   position: relative;
+  min-width: 0;
 }
 
+/* BOTÃO DO USUÁRIO */
+
 .l-sidebar__user {
+  position: relative;
+
   display: flex;
   align-items: center;
-  gap: 11px;
+  justify-content: flex-start;
 
   width: 100%;
-  min-height: 54px;
+  min-width: 0;
+  min-height: 48px;
 
-  padding: 8px;
+  padding: 6px;
+
+  border: 1px solid transparent;
+  border-radius: 8px;
 
   background: transparent;
-  border: 1px solid transparent;
-  border-radius: 9px;
-
-  text-align: left;
   color: var(--color-text-primary);
+
+  font: inherit;
+  text-align: left;
+
   cursor: pointer;
+  overflow: hidden;
+
+  transition:
+    background-color 200ms ease,
+    border-color 200ms ease;
 }
 
 .l-sidebar__user:hover,
@@ -234,61 +330,102 @@
   border-color: var(--color-border-subtle);
 }
 
+/* AVATAR FIXO */
+
 .l-sidebar__avatar {
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-shrink: 0;
 
-  width: 37px;
-  height: 37px;
+  flex: 0 0 35px;
+
+  width: 35px;
+  height: 35px;
 
   border-radius: 50%;
   background: var(--color-primary-subtle);
 
   color: var(--color-primary);
-  font-size: 12px;
+
+  font-size: 11px;
   font-weight: 700;
 }
 
+/* INFORMAÇÕES DO USUÁRIO */
+
 .l-sidebar__user-info {
+  position: absolute;
+
+  left: 50px;
+  right: 24px;
+
   display: flex;
-  flex: 1;
   flex-direction: column;
   gap: 4px;
 
   min-width: 0;
+  overflow: hidden;
+
+  opacity: 1;
+  visibility: visible;
+
+  transition:
+    opacity 180ms ease 100ms,
+    visibility 0s;
 }
 
 .l-sidebar__user-info strong {
   overflow: hidden;
+
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-size: 12px;
+
+  font-size: 11px;
   font-weight: 650;
 }
 
 .l-sidebar__user-info small {
   overflow: hidden;
+
   text-overflow: ellipsis;
   white-space: nowrap;
 
   color: var(--color-text-muted);
-  font-size: 11px;
+  font-size: 10px;
 }
 
+/* SETA DO USUÁRIO */
+
 .l-sidebar__user > svg {
+  position: absolute;
+  right: 6px;
+
   flex-shrink: 0;
+
   color: var(--color-text-muted);
-  transition: transform var(--transition-base);
+
+  opacity: 1;
+  visibility: visible;
+
+  transition:
+    opacity 180ms ease,
+    transform 200ms ease;
 }
 
 .l-sidebar__chevron--open {
   transform: rotate(180deg);
 }
 
-.l-sidebar--collapsed .l-sidebar__user {
-  justify-content: center;
+/* ESTADO RECOLHIDO */
+
+.l-sidebar--collapsed .l-sidebar__user-info,
+.l-sidebar--collapsed .l-sidebar__user > svg {
+  opacity: 0;
+  visibility: hidden;
+
+  transition:
+    opacity 150ms ease,
+    visibility 0s linear 150ms;
 }
 
 /* ==========================================
@@ -297,8 +434,10 @@
 
 .l-sidebar__user-menu {
   position: absolute;
+
   bottom: calc(100% + 12px);
   left: 0;
+
   z-index: var(--z-index-dropdown);
 
   width: max(100%, 210px);
@@ -309,8 +448,19 @@
   background: var(--color-surface);
   border: 1px solid var(--color-border-subtle);
   border-radius: 10px;
+
   box-shadow: var(--shadow-md);
 }
+
+/* MENU NA SIDEBAR RECOLHIDA */
+
+.l-sidebar--collapsed .l-sidebar__user-menu {
+  left: 0;
+  bottom: calc(100% + 12px);
+  width: 230px;
+}
+
+/* CABEÇALHO DO MENU */
 
 .l-sidebar__user-menu-header {
   display: flex;
@@ -334,6 +484,8 @@
   overflow-wrap: anywhere;
 }
 
+/* BOTÕES DO MENU */
+
 .l-sidebar__user-menu button {
   display: flex;
   align-items: center;
@@ -353,11 +505,15 @@
   text-align: left;
 
   cursor: pointer;
+
+  transition: background-color 200ms ease;
 }
 
 .l-sidebar__user-menu button:hover {
   background: var(--color-primary-subtle);
 }
+
+/* LOGOUT */
 
 .l-sidebar__user-menu .l-sidebar__logout {
   color: var(--color-danger);
@@ -372,6 +528,13 @@
   cursor: not-allowed;
 }
 
+/* Permite que o menu seja exibido
+   fora dos limites da sidebar. */
+
+.l-sidebar:has(.l-sidebar__user-menu) {
+  overflow: visible;
+}
+
 /* ==========================================
    RESPONSIVIDADE
    ========================================== */
@@ -382,56 +545,61 @@
     align-items: center;
   }
 
+  /* CABEÇALHO */
+
   .l-sidebar__header {
     display: none;
   }
+
+  /* NAVEGAÇÃO HORIZONTAL */
 
   .l-sidebar__navigation {
     flex: 1;
     flex-direction: row;
     align-items: center;
-    gap: 2px;
+
+    gap: 3px;
 
     height: 100%;
     padding: 5px;
+
     overflow-x: auto;
     overflow-y: hidden;
   }
 
-  .l-sidebar__item,
-  .l-sidebar--collapsed .l-sidebar__item {
-    flex: 0 0 auto;
-    justify-content: center;
-    min-width: 43px;
-    min-height: 48px;
-    padding: 9px;
+  .l-sidebar__item {
+    flex: 0 0 42px;
+
+    justify-content: flex-start;
+
+    width: 42px;
+    min-width: 42px;
+    height: 42px;
+
+    padding: 0 11px;
   }
 
   .l-sidebar__item-label {
     display: none;
   }
 
-  .l-sidebar__item--active::before {
-    top: auto;
-    bottom: -6px;
-    left: 12px;
-    right: 12px;
-    width: auto;
-    height: 3px;
-  }
+  /* RODAPÉ */
 
   .l-sidebar__footer {
     flex: 0 0 auto;
+
     padding: 5px;
+
     border-top: 0;
     border-left: 1px solid var(--color-border-subtle);
   }
 
   .l-sidebar__user {
-    justify-content: center;
-    width: 48px;
-    min-height: 48px;
-    padding: 5px;
+    width: 44px;
+    min-width: 44px;
+    min-height: 44px;
+
+    padding: 4px;
   }
 
   .l-sidebar__user-info,
@@ -439,8 +607,28 @@
     display: none;
   }
 
-  .l-sidebar__user-menu {
+  /* MENU DO USUÁRIO */
+
+  .l-sidebar__user-menu,
+  .l-sidebar--collapsed .l-sidebar__user-menu {
     left: auto;
     right: 0;
+
+    bottom: calc(100% + 12px);
+
+    width: 230px;
+  }
+}
+
+/* ==========================================
+   ACESSIBILIDADE
+   ========================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .l-sidebar *,
+  .l-sidebar *::before,
+  .l-sidebar *::after {
+    transition: none !important;
+    animation: none !important;
   }
 }

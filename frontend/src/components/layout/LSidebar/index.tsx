@@ -2,9 +2,6 @@ import { useEffect, useRef, useState } from "react";
 
 import {
   ChartNoAxesCombined,
-  ChevronDown,
-  ChevronLeft,
-  ChevronRight,
   Database,
   FileText,
   LayoutDashboard,
@@ -122,7 +119,7 @@ export function LSidebar({ expanded, onToggle }: LSidebarProps) {
 
       await httpClient.post("/auth/logout");
     } catch {
-      // Limpa a sessão local mesmo quando a API não responde.
+      // Limpa a sessão local mesmo se a API não responder.
     } finally {
       logout();
       setUserMenuOpen(false);
@@ -139,27 +136,29 @@ export function LSidebar({ expanded, onToggle }: LSidebarProps) {
     >
       {/* IDENTIDADE VISUAL */}
       <header className="l-sidebar__header">
-        <div className="l-sidebar__brand">
-          <div className="l-sidebar__brand-symbol">
-            <Layers3 size={25} strokeWidth={1.8} />
-          </div>
-
-          {expanded && (
-            <div className="l-sidebar__brand-text">
-              <strong>Portal de Dados</strong>
-              <span>Irrigação Tocantins</span>
-            </div>
-          )}
-        </div>
-
         <button
           type="button"
-          className="l-sidebar__toggle"
-          onClick={onToggle}
-          aria-label={expanded ? "Recolher menu" : "Expandir menu"}
+          className="l-sidebar__brand"
+          onClick={() => {
+            setUserMenuOpen(false);
+            onToggle();
+          }}
+          aria-label={
+            expanded ? "Recolher menu lateral" : "Expandir menu lateral"
+          }
+          aria-expanded={expanded}
           title={expanded ? "Recolher menu" : "Expandir menu"}
         >
-          {expanded ? <ChevronLeft size={17} /> : <ChevronRight size={17} />}
+          <span className="l-sidebar__brand-symbol">
+            <Layers3 size={24} strokeWidth={1.8} aria-hidden="true" />
+          </span>
+
+          {expanded && (
+            <span className="l-sidebar__brand-text">
+              <strong>Portal de Dados</strong>
+              <span>Irrigação Tocantins</span>
+            </span>
+          )}
         </button>
       </header>
 
@@ -220,23 +219,14 @@ export function LSidebar({ expanded, onToggle }: LSidebarProps) {
             onClick={() => setUserMenuOpen((current) => !current)}
             aria-label="Abrir opções do usuário"
             aria-expanded={userMenuOpen}
-            aria-haspopup="true"
+            aria-haspopup="menu"
           >
             <span className="l-sidebar__avatar">{initials}</span>
 
-            {expanded && (
-              <>
-                <span className="l-sidebar__user-info">
-                  <strong>{userName}</strong>
-                  <small>{usuario?.no_tipo_usuario || "Minha conta"}</small>
-                </span>
-
-                <ChevronDown
-                  size={16}
-                  className={userMenuOpen ? "l-sidebar__chevron--open" : ""}
-                />
-              </>
-            )}
+            <span className="l-sidebar__brand-text">
+              <strong>Portal de Dados</strong>
+              <span>Irrigação Tocantins</span>
+            </span>
           </button>
         </div>
       </footer>

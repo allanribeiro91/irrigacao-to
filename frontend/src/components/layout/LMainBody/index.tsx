@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 
 import { LSidebar } from "../LSidebar";
 
@@ -9,7 +9,13 @@ interface LMainBodyProps {
 }
 
 export function LMainBody({ children }: LMainBodyProps) {
-  const [sidebarExpanded, setSidebarExpanded] = useState(true);
+  const [sidebarExpanded, setSidebarExpanded] = useState<boolean>(
+    () => localStorage.getItem("sidebarExpanded") === "true",
+  );
+
+  useEffect(() => {
+    localStorage.setItem("sidebarExpanded", String(sidebarExpanded));
+  }, [sidebarExpanded]);
 
   return (
     <div
