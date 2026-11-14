@@ -332,3 +332,34 @@
     width: 100%;
   }
 }
+
+/* FORMULÁRIO DENTRO DO OFFCANVAS */
+
+.edit-catalog--embedded {
+  width: 100%;
+  max-width: none;
+
+  margin: 0;
+  padding: 0;
+
+  gap: 18px;
+}
+
+.edit-catalog--embedded .edit-catalog__section-header {
+  padding: 16px;
+}
+
+.edit-catalog--embedded .edit-catalog__section-content {
+  padding: 16px;
+}
+
+.edit-catalog--embedded .edit-catalog__grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+@media (max-width: 720px) {
+  .edit-catalog--embedded .edit-catalog__grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

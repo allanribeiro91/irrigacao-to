@@ -1,5 +1,5 @@
-import { LMainBody } from "../../components/layout/LMainBody";
-import { LWorkspace } from "../../components/layout/LWorkspace";
+import { LMainBody } from "../LMainBody";
+import { LWorkspace } from "../LWorkspace";
 
 import "./index.css";
 

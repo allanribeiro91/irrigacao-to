@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState, type ReactNode } from "react";
-
+import { DOMINIOS_JSON } from "../../config/dominios";
 import { UserContext } from "./context";
 
 import type { LoginResult, UsuarioAutenticado, UserContextValue } from "./type";
@@ -55,16 +55,26 @@ export function UserProvider({ children }: UserProviderProps) {
     setUsuario(null);
   }, []);
 
-  const value = useMemo<UserContextValue>(
-    () => ({
+  const value = useMemo<UserContextValue>(() => {
+    const isAuthenticated = Boolean(token && usuario);
+
+    const tipoUsuario = isAuthenticated ? usuario?.co_tp_usuario : null;
+
+    const isMaster = tipoUsuario === DOMINIOS_JSON.TIPO_USUARIO.MASTER;
+
+    const isAdmin =
+      isMaster || tipoUsuario === DOMINIOS_JSON.TIPO_USUARIO.ADMINISTRADOR;
+
+    return {
       usuario,
       token,
-      isAuthenticated: Boolean(token && usuario),
+      isAuthenticated,
+      isMaster,
+      isAdmin,
       setUserSession,
       logout,
-    }),
-    [usuario, token, setUserSession, logout],
-  );
+    };
+  }, [usuario, token, setUserSession, logout]);
 
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;
 }

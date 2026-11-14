@@ -1,0 +1,333 @@
+/* ==========================================
+   SIDEBAR USER
+   ========================================== */
+
+.sidebar-user {
+  position: relative;
+
+  width: 100%;
+  min-width: 0;
+}
+
+/* ==========================================
+   BOTÃO DO USUÁRIO
+   ========================================== */
+
+.sidebar-user__trigger {
+  position: relative;
+
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+
+  width: 100%;
+  min-width: 0;
+  min-height: 48px;
+
+  padding: 6px;
+
+  border: 1px solid transparent;
+  border-radius: 8px;
+
+  background: transparent;
+  color: var(--color-text-primary);
+
+  font: inherit;
+  text-align: left;
+
+  cursor: pointer;
+  overflow: hidden;
+
+  transition:
+    background-color 180ms ease,
+    border-color 180ms ease;
+}
+
+.sidebar-user__trigger:hover,
+.sidebar-user__trigger[aria-expanded="true"] {
+  background: var(--color-primary-subtle);
+  border-color: var(--color-border-subtle);
+}
+
+.sidebar-user__trigger:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: -2px;
+}
+
+/* ==========================================
+   AVATAR
+   ========================================== */
+
+.sidebar-user__avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex: 0 0 35px;
+
+  width: 35px;
+  height: 35px;
+
+  border-radius: 50%;
+
+  background: var(--color-primary-subtle);
+  color: var(--color-primary);
+
+  font-size: 11px;
+  font-weight: 700;
+}
+
+/* ==========================================
+   INFORMAÇÕES
+   ========================================== */
+
+.sidebar-user__info {
+  position: absolute;
+
+  left: 50px;
+  right: 25px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  min-width: 0;
+  overflow: hidden;
+
+  opacity: 1;
+  visibility: visible;
+
+  transition:
+    opacity 180ms ease 100ms,
+    visibility 0s;
+}
+
+.sidebar-user__name-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  min-width: 0;
+}
+
+.sidebar-user__name {
+  display: block;
+
+  min-width: 0;
+  overflow: hidden;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  font-size: 11px;
+  font-weight: 650;
+  line-height: 1.3;
+}
+
+.sidebar-user__cpf {
+  display: block;
+
+  color: var(--color-text-muted);
+
+  font-size: 10px;
+  line-height: 1.3;
+
+  white-space: nowrap;
+}
+
+/* ==========================================
+   BADGE MASTER
+   ========================================== */
+
+.sidebar-user__master {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  flex: 0 0 18px;
+
+  width: 18px;
+  height: 18px;
+
+  border-radius: 5px;
+
+  background: var(--color-primary);
+  color: #ffffff;
+
+  font-size: 10px;
+  font-weight: 750;
+  line-height: 1;
+}
+
+/* ==========================================
+   CHEVRON
+   ========================================== */
+
+.sidebar-user__chevron {
+  position: absolute;
+  right: 5px;
+
+  flex-shrink: 0;
+
+  color: var(--color-text-muted);
+
+  opacity: 1;
+  visibility: visible;
+
+  transition:
+    opacity 180ms ease,
+    transform 200ms ease;
+}
+
+.sidebar-user__chevron--open {
+  transform: rotate(180deg);
+}
+
+/* ==========================================
+   SIDEBAR RECOLHIDA
+   ========================================== */
+
+.l-sidebar--collapsed .sidebar-user__info,
+.l-sidebar--collapsed .sidebar-user__chevron {
+  opacity: 0;
+  visibility: hidden;
+
+  transition:
+    opacity 150ms ease,
+    visibility 0s linear 150ms;
+}
+
+/* ==========================================
+   MENU DO USUÁRIO
+   ========================================== */
+
+.sidebar-user__menu {
+  position: absolute;
+
+  bottom: calc(100% + 12px);
+  left: 0;
+
+  z-index: var(--z-index-dropdown);
+
+  width: max(100%, 210px);
+  max-width: min(280px, calc(100vw - 32px));
+
+  padding: 6px;
+
+  background: var(--color-surface);
+
+  border: 1px solid var(--color-border-subtle);
+  border-radius: 10px;
+
+  box-shadow: var(--shadow-md);
+}
+
+.l-sidebar--collapsed .sidebar-user__menu {
+  width: 230px;
+}
+
+/* CABEÇALHO DO MENU */
+
+.sidebar-user__menu-header {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  padding: 12px;
+  margin-bottom: 5px;
+
+  border-bottom: 1px solid var(--color-border-subtle);
+}
+
+.sidebar-user__menu-header strong {
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+
+.sidebar-user__menu-header span {
+  color: var(--color-text-muted);
+
+  font-size: 11px;
+  overflow-wrap: anywhere;
+}
+
+/* OPÇÕES */
+
+.sidebar-user__menu-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  width: 100%;
+  padding: 11px 12px;
+
+  border: 0;
+  border-radius: 7px;
+
+  background: transparent;
+  color: var(--color-text-primary);
+
+  font: inherit;
+  font-size: 12px;
+  text-align: left;
+
+  cursor: pointer;
+
+  transition: background-color 180ms ease;
+}
+
+.sidebar-user__menu-item:hover {
+  background: var(--color-primary-subtle);
+}
+
+/* LOGOUT */
+
+.sidebar-user__logout {
+  color: var(--color-danger);
+}
+
+.sidebar-user__logout:hover {
+  background: var(--color-danger-subtle);
+}
+
+.sidebar-user__menu-item:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ==========================================
+   RESPONSIVIDADE
+   ========================================== */
+
+@media (max-width: 680px) {
+  .sidebar-user__trigger {
+    width: 44px;
+    min-width: 44px;
+    min-height: 44px;
+
+    padding: 4px;
+  }
+
+  .sidebar-user__info,
+  .sidebar-user__chevron {
+    display: none;
+  }
+
+  .sidebar-user__menu,
+  .l-sidebar--collapsed .sidebar-user__menu {
+    left: auto;
+    right: 0;
+
+    width: 230px;
+    bottom: calc(100% + 12px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sidebar-user__trigger,
+  .sidebar-user__info,
+  .sidebar-user__chevron,
+  .sidebar-user__menu-item {
+    transition: none;
+  }
+}

@@ -18,6 +18,9 @@ export interface UserContextValue {
   token: string | null;
   isAuthenticated: boolean;
 
+  isMaster: boolean;
+  isAdmin: boolean;
+
   setUserSession: (resultado: LoginResult) => void;
   logout: () => void;
 }

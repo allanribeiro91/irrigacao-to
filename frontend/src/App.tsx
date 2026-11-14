@@ -2,7 +2,7 @@ import { Navigate, Route, Routes } from "react-router";
 
 import { CENTRAL_PATHS } from "./config/paths";
 
-import { LPortalLayout } from "./layouts/LPortalLayout";
+import { LPortalLayout } from "./components/layout/LIndex";
 
 import { LoginPage } from "./pages/auth/LoginPage";
 import { CadastroPage } from "./pages/auth/Cadastro";

@@ -37,6 +37,8 @@ import {
 } from "./form";
 
 import "./index.css";
+import type { CatalogData } from "../type";
+import { getDominioOptions } from "../../../../config/dominios";
 
 type FieldName = keyof CatalogFormData;
 
@@ -150,12 +152,32 @@ function FormSection({ icon, title, description, children }: FormSectionProps) {
   );
 }
 
-export function EditCatalog() {
+interface EditCatalogProps {
+  catalog?: CatalogData | null;
+  embedded?: boolean;
+  onCancel?: () => void;
+  onSaved?: () => void | Promise<void>;
+  onDeleted?: () => void | Promise<void>;
+}
+
+export function EditCatalog({
+  catalog,
+  embedded = false,
+  onCancel,
+  onSaved,
+  onDeleted,
+}: EditCatalogProps) {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
 
-  const catalogId = id ? Number(id) : null;
-  const isEditing = id !== undefined;
+  const catalogId =
+    catalog !== undefined
+      ? (catalog?.CO_SEQ_CATALOGO_DADO ?? null)
+      : id
+        ? Number(id)
+        : null;
+
+  const isEditing = catalog !== undefined ? catalog !== null : id !== undefined;
   const invalidId =
     isEditing &&
     (!Number.isSafeInteger(catalogId) || catalogId === null || catalogId <= 0);
@@ -168,6 +190,11 @@ export function EditCatalog() {
   const [error, setError] = useState<string | null>(null);
 
   function goBack() {
+    if (embedded && onCancel) {
+      onCancel();
+      return;
+    }
+
     navigate("/portal/catalogo");
   }
 
@@ -179,8 +206,9 @@ export function EditCatalog() {
   }
 
   useEffect(() => {
-    if (!isEditing) {
-      setForm({ ...initialCatalogForm });
+    if (catalog !== undefined) {
+      setForm(catalog ? catalogToForm(catalog) : { ...initialCatalogForm });
+
       setError(null);
       setLoading(false);
       return;
@@ -244,16 +272,16 @@ export function EditCatalog() {
       const payload = formToCatalogPayload(form);
 
       if (isEditing) {
-        if (catalogId === null || invalidId) {
-          throw new Error("Identificador inválido.");
-        }
-
         await updateCatalog(catalogId, payload);
       } else {
         await createCatalog(payload);
       }
 
-      navigate("/portal/catalogo");
+      if (embedded && onSaved) {
+        await onSaved();
+      } else {
+        navigate("/portal/catalogo");
+      }
     } catch (err) {
       setError(getHttpErrorMessage(err, "Não foi possível salvar o cadastro."));
 
@@ -279,7 +307,11 @@ export function EditCatalog() {
       setError(null);
 
       await deleteCatalog(catalogId);
-      navigate("/portal/catalogo");
+      if (embedded && onDeleted) {
+        await onDeleted();
+      } else {
+        navigate("/portal/catalogo");
+      }
     } catch (err) {
       setError(
         getHttpErrorMessage(err, "Não foi possível inativar o cadastro."),
@@ -315,35 +347,41 @@ export function EditCatalog() {
   }
 
   return (
-    <div className="edit-catalog">
-      <header className="edit-catalog__page-header">
-        <button type="button" className="edit-catalog__back" onClick={goBack}>
-          <ArrowLeft size={17} />
-          Voltar ao catálogo
-        </button>
+    <div
+      className={
+        embedded ? "edit-catalog edit-catalog--embedded" : "edit-catalog"
+      }
+    >
+      {!embedded && (
+        <header className="edit-catalog__page-header">
+          <button type="button" className="edit-catalog__back" onClick={goBack}>
+            <ArrowLeft size={17} />
+            Voltar ao catálogo
+          </button>
 
-        <div className="edit-catalog__page-heading">
-          <div className="edit-catalog__page-icon">
-            <Database size={24} />
+          <div className="edit-catalog__page-heading">
+            <div className="edit-catalog__page-icon">
+              <Database size={24} />
+            </div>
+
+            <div>
+              <span>Governança de dados</span>
+
+              <h1>
+                {isEditing
+                  ? "Editar conjunto de dados"
+                  : "Novo conjunto de dados"}
+              </h1>
+
+              <p>
+                {isEditing
+                  ? "Atualize os metadados do conjunto de dados."
+                  : "Cadastre um conjunto de dados no catálogo."}
+              </p>
+            </div>
           </div>
-
-          <div>
-            <span>Governança de dados</span>
-
-            <h1>
-              {isEditing
-                ? "Editar conjunto de dados"
-                : "Novo conjunto de dados"}
-            </h1>
-
-            <p>
-              {isEditing
-                ? "Atualize os metadados do conjunto de dados."
-                : "Cadastre um conjunto de dados no catálogo."}
-            </p>
-          </div>
-        </div>
-      </header>
+        </header>
+      )}
 
       {error && (
         <div className="edit-catalog__alert" role="alert">
@@ -396,7 +434,7 @@ export function EditCatalog() {
                 label="Tipo de dado"
                 value={form.CO_TP_DADO}
                 onChange={updateField}
-                options={tipoDadoOptions}
+                options={getDominioOptions("TIPO_DADO")}
                 required
               />
 
@@ -405,7 +443,7 @@ export function EditCatalog() {
                 label="Tema"
                 value={form.CO_TEMA}
                 onChange={updateField}
-                options={temaOptions}
+                options={getDominioOptions("TEMA_DADO")}
               />
 
               <FormField
@@ -506,7 +544,7 @@ export function EditCatalog() {
                 label="Periodicidade"
                 value={form.CO_PERIODICIDADE}
                 onChange={updateField}
-                options={periodicidadeOptions}
+                options={getDominioOptions("PERIODICIDADE_DADO")}
               />
 
               <FormField

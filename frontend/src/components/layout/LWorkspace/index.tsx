@@ -1,7 +1,6 @@
 import { Outlet, useLocation } from "react-router";
 
 import { Breadcrumb } from "./Breadcrumb";
-
 import { getBreadcrumbByPath } from "../../../config/paths.helper";
 
 import "./index.css";
@@ -18,7 +17,9 @@ export function LWorkspace() {
       </header>
 
       <section className="l-workspace__content">
-        <Outlet />
+        <div className="l-workspace__scroll">
+          <Outlet />
+        </div>
       </section>
     </main>
   );
