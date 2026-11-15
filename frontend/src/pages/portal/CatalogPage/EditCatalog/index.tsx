@@ -1,7 +1,5 @@
 import { useEffect, useState, type FormEvent } from "react";
-
 import { useNavigate, useParams } from "react-router";
-
 import {
   ArrowLeft,
   CalendarDays,
@@ -22,135 +20,24 @@ import {
   getCatalogById,
   updateCatalog,
 } from "../service";
-
 import { getHttpErrorMessage } from "../../../../services/httpClient";
-
 import {
   catalogToForm,
   formToCatalogPayload,
   initialCatalogForm,
-  periodicidadeOptions,
-  temaOptions,
-  tipoDadoOptions,
   validateCatalogForm,
   type CatalogFormData,
 } from "./form";
-
-import "./index.css";
 import type { CatalogData } from "../type";
-import { getDominioOptions } from "../../../../config/dominios";
+import CustomInputText from "../../../../components/CustomInputText";
+import CustomInputDate from "../../../../components/CustomInputDate";
+import CustomSelect from "../../../../components/CustomSelect";
+import CustomRow from "../../../../components/CustomRow";
+import CustomCol from "../../../../components/CustomCol";
+import CustomBox from "../../../../components/CustomBox";
+import "./index.css";
 
 type FieldName = keyof CatalogFormData;
-
-type SelectOption = {
-  value: number;
-  label: string;
-};
-
-interface FormFieldProps {
-  name: FieldName;
-  label: string;
-  value: string;
-  onChange: (name: FieldName, value: string) => void;
-  required?: boolean;
-  type?: "text" | "date" | "datetime-local" | "url";
-  multiline?: boolean;
-  options?: SelectOption[];
-  placeholder?: string;
-  hint?: string;
-  maxLength?: number;
-}
-
-function FormField({
-  name,
-  label,
-  value,
-  onChange,
-  required = false,
-  type = "text",
-  multiline = false,
-  options,
-  placeholder,
-  hint,
-  maxLength,
-}: FormFieldProps) {
-  const id = `catalog-${name.toLowerCase()}`;
-
-  return (
-    <div className="edit-catalog__field">
-      <label htmlFor={id}>
-        {label}
-        {required && <span className="edit-catalog__required"> *</span>}
-      </label>
-
-      {options ? (
-        <select
-          id={id}
-          name={name}
-          value={value}
-          required={required}
-          onChange={(event) => onChange(name, event.target.value)}
-        >
-          <option value="">Selecione...</option>
-
-          {options.map((option) => (
-            <option key={option.value} value={option.value}>
-              {option.label}
-            </option>
-          ))}
-        </select>
-      ) : multiline ? (
-        <textarea
-          id={id}
-          name={name}
-          value={value}
-          required={required}
-          maxLength={maxLength}
-          placeholder={placeholder}
-          rows={4}
-          onChange={(event) => onChange(name, event.target.value)}
-        />
-      ) : (
-        <input
-          id={id}
-          name={name}
-          type={type}
-          value={value}
-          required={required}
-          maxLength={maxLength}
-          placeholder={placeholder}
-          onChange={(event) => onChange(name, event.target.value)}
-        />
-      )}
-
-      {hint && <small className="edit-catalog__hint">{hint}</small>}
-    </div>
-  );
-}
-
-interface FormSectionProps {
-  icon: React.ReactNode;
-  title: string;
-  description: string;
-  children: React.ReactNode;
-}
-
-function FormSection({ icon, title, description, children }: FormSectionProps) {
-  return (
-    <section className="edit-catalog__section">
-      <header className="edit-catalog__section-header">
-        <div className="edit-catalog__section-icon">{icon}</div>
-
-        <div>
-          <h2>{title}</h2>
-          <p>{description}</p>
-        </div>
-      </header>
-
-      <div className="edit-catalog__section-content">{children}</div>
-    </section>
-  );
-}
 
 interface EditCatalogProps {
   catalog?: CatalogData | null;
@@ -169,22 +56,21 @@ export function EditCatalog({
 }: EditCatalogProps) {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
-
   const catalogId =
     catalog !== undefined
       ? (catalog?.CO_SEQ_CATALOGO_DADO ?? null)
       : id
         ? Number(id)
         : null;
-
   const isEditing = catalog !== undefined ? catalog !== null : id !== undefined;
   const invalidId =
     isEditing &&
-    (!Number.isSafeInteger(catalogId) || catalogId === null || catalogId <= 0);
+    (catalogId === null || !Number.isSafeInteger(catalogId) || catalogId <= 0);
 
-  const [form, setForm] = useState<CatalogFormData>({ ...initialCatalogForm });
-
-  const [loading, setLoading] = useState(isEditing);
+  const [form, setForm] = useState<CatalogFormData>(() =>
+    catalog ? catalogToForm(catalog) : { ...initialCatalogForm },
+  );
+  const [loading, setLoading] = useState(isEditing && catalog === undefined);
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -194,97 +80,72 @@ export function EditCatalog({
       onCancel();
       return;
     }
-
     navigate("/portal/catalogo");
   }
 
   function updateField(name: FieldName, value: string) {
-    setForm((current) => ({
-      ...current,
-      [name]: value,
-    }));
+    setForm((current) => ({ ...current, [name]: value }));
   }
 
   useEffect(() => {
     if (catalog !== undefined) {
-      setForm(catalog ? catalogToForm(catalog) : { ...initialCatalogForm });
-
-      setError(null);
-      setLoading(false);
+      // Dados recebidos do pai: não há requisição a executar.
+      // Em aplicações com troca frequente de registros, prefira uma key
+      // no componente pai para reinicializar o formulário por registro.
       return;
     }
-
-    if (invalidId || catalogId === null) {
-      setError("Identificador do catálogo inválido.");
-      setLoading(false);
-      return;
-    }
+    if (!isEditing || invalidId || catalogId === null) return;
 
     let active = true;
-
     async function load() {
       try {
         setLoading(true);
         setError(null);
-
-        const catalog = await getCatalogById(catalogId!);
-
-        if (active) {
-          setForm(catalogToForm(catalog));
-        }
+        const result = await getCatalogById(catalogId!);
+        if (active) setForm(catalogToForm(result));
       } catch (err) {
-        if (active) {
+        if (active)
           setError(
             getHttpErrorMessage(err, "Não foi possível carregar o cadastro."),
           );
-        }
       } finally {
-        if (active) {
-          setLoading(false);
-        }
+        if (active) setLoading(false);
       }
     }
-
     void load();
-
     return () => {
       active = false;
     };
-  }, [catalogId, invalidId, isEditing]);
+  }, [catalog, catalogId, invalidId, isEditing]);
+
+  // Os dados embutidos são usados na montagem inicial do formulário.
+  // Para outro registro, o pai deve utilizar key={catalog?.CO_SEQ_CATALOGO_DADO ?? "novo"}.
+  // Caso a edição embutida exija sincronização sem remontagem, faça-a no pai.
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-
     if (saving || deleting || loading) return;
-
     const validationError = validateCatalogForm(form);
-
     if (validationError) {
       setError(validationError);
       window.scrollTo({ top: 0, behavior: "smooth" });
       return;
     }
-
     try {
       setSaving(true);
       setError(null);
-
       const payload = formToCatalogPayload(form);
-
-      if (isEditing) {
+      if (isEditing && catalogId !== null && !invalidId) {
         await updateCatalog(catalogId, payload);
-      } else {
+      } else if (!isEditing) {
         await createCatalog(payload);
-      }
-
-      if (embedded && onSaved) {
-        await onSaved();
       } else {
-        navigate("/portal/catalogo");
+        throw new Error("Identificador do catálogo inválido.");
       }
+      if (embedded && onSaved) await onSaved();
+      else navigate("/portal/catalogo");
     } catch (err) {
       setError(getHttpErrorMessage(err, "Não foi possível salvar o cadastro."));
-
       window.scrollTo({ top: 0, behavior: "smooth" });
     } finally {
       setSaving(false);
@@ -292,26 +153,16 @@ export function EditCatalog({
   }
 
   async function handleDelete() {
-    if (!isEditing || catalogId === null || invalidId || saving || deleting) {
+    if (!isEditing || catalogId === null || invalidId || saving || deleting)
       return;
-    }
-
-    const confirmed = window.confirm(
-      "Deseja realmente inativar este conjunto de dados?",
-    );
-
-    if (!confirmed) return;
-
+    if (!window.confirm("Deseja realmente inativar este conjunto de dados?"))
+      return;
     try {
       setDeleting(true);
       setError(null);
-
       await deleteCatalog(catalogId);
-      if (embedded && onDeleted) {
-        await onDeleted();
-      } else {
-        navigate("/portal/catalogo");
-      }
+      if (embedded && onDeleted) await onDeleted();
+      else navigate("/portal/catalogo");
     } catch (err) {
       setError(
         getHttpErrorMessage(err, "Não foi possível inativar o cadastro."),
@@ -323,28 +174,25 @@ export function EditCatalog({
 
   const busy = loading || saving || deleting;
 
-  if (loading) {
+  if (loading)
     return (
       <div className="edit-catalog__loading">
         <LoaderCircle size={24} className="edit-catalog__spin" />
         Carregando dados do catálogo...
       </div>
     );
-  }
 
-  if (isEditing && (invalidId || (error && !form.NO_CONJUNTO_DADO))) {
+  if (isEditing && (invalidId || (error && !form.NO_CONJUNTO_DADO)))
     return (
       <div className="edit-catalog">
         <button type="button" className="edit-catalog__back" onClick={goBack}>
-          <ArrowLeft size={17} />
-          Voltar ao catálogo
+          <ArrowLeft size={17} /> Voltar ao catálogo
         </button>
         <div className="edit-catalog__alert" role="alert">
           {error || "Identificador inválido."}
         </div>
       </div>
     );
-  }
 
   return (
     <div
@@ -355,24 +203,19 @@ export function EditCatalog({
       {!embedded && (
         <header className="edit-catalog__page-header">
           <button type="button" className="edit-catalog__back" onClick={goBack}>
-            <ArrowLeft size={17} />
-            Voltar ao catálogo
+            <ArrowLeft size={17} /> Voltar ao catálogo
           </button>
-
           <div className="edit-catalog__page-heading">
             <div className="edit-catalog__page-icon">
               <Database size={24} />
             </div>
-
             <div>
               <span>Governança de dados</span>
-
               <h1>
                 {isEditing
                   ? "Editar conjunto de dados"
                   : "Novo conjunto de dados"}
               </h1>
-
               <p>
                 {isEditing
                   ? "Atualize os metadados do conjunto de dados."
@@ -391,246 +234,302 @@ export function EditCatalog({
 
       <form className="edit-catalog__form" onSubmit={handleSubmit}>
         <fieldset className="edit-catalog__fieldset" disabled={busy}>
-          <FormSection
+          <CustomBox
             icon={<FileText size={19} />}
             title="Identificação"
             description="Informações gerais que identificam o conjunto de dados."
+            keepMounted
           >
-            <div className="edit-catalog__grid">
-              <div className="edit-catalog__full">
-                <FormField
+            <CustomRow>
+              <CustomCol>
+                <CustomInputText
                   name="NO_CONJUNTO_DADO"
-                  label="Nome do conjunto de dados"
+                  title="Nome do conjunto de dados"
                   value={form.NO_CONJUNTO_DADO}
-                  onChange={updateField}
+                  onChange={(e) =>
+                    updateField("NO_CONJUNTO_DADO", e.target.value)
+                  }
                   required
                   maxLength={255}
                   placeholder="Ex.: Limites municipais do Tocantins"
                 />
-              </div>
-
-              <div className="edit-catalog__full">
-                <FormField
+              </CustomCol>
+            </CustomRow>
+            <CustomRow>
+              <CustomCol>
+                <CustomInputText
                   name="DS_DESCRICAO"
-                  label="Descrição"
+                  title="Descrição"
+                  type="textArea"
+                  rows={4}
                   value={form.DS_DESCRICAO}
-                  onChange={updateField}
+                  onChange={(e) => updateField("DS_DESCRICAO", e.target.value)}
                   required
-                  multiline
                   placeholder="Descreva o conteúdo e a finalidade do conjunto de dados."
                 />
-              </div>
-            </div>
-          </FormSection>
+              </CustomCol>
+            </CustomRow>
+          </CustomBox>
 
-          <FormSection
+          <CustomBox
             icon={<Layers3 size={19} />}
             title="Classificação"
             description="Classificação temática e natureza dos dados."
+            keepMounted
           >
-            <div className="edit-catalog__grid">
-              <FormField
-                name="CO_TP_DADO"
-                label="Tipo de dado"
-                value={form.CO_TP_DADO}
-                onChange={updateField}
-                options={getDominioOptions("TIPO_DADO")}
-                required
-              />
+            <CustomRow>
+              <CustomCol>
+                <CustomSelect
+                  name="CO_TP_DADO"
+                  title="Tipo de dado"
+                  dominio="TIPO_DADO"
+                  value={form.CO_TP_DADO}
+                  onChange={(e) => updateField("CO_TP_DADO", e.target.value)}
+                  required
+                />
+              </CustomCol>
+              <CustomCol>
+                <CustomSelect
+                  name="CO_TEMA"
+                  title="Tema"
+                  dominio="TEMA_DADO"
+                  value={form.CO_TEMA}
+                  onChange={(e) => updateField("CO_TEMA", e.target.value)}
+                />
+              </CustomCol>
+            </CustomRow>
+            <CustomRow>
+              <CustomCol>
+                <CustomInputText
+                  name="NO_FORMATO"
+                  title="Formato"
+                  value={form.NO_FORMATO}
+                  onChange={(e) => updateField("NO_FORMATO", e.target.value)}
+                  maxLength={50}
+                  placeholder="Ex.: CSV, GeoJSON, KML"
+                />
+              </CustomCol>
+              <CustomCol>
+                <CustomInputText
+                  name="DS_GRANULARIDADE"
+                  title="Granularidade"
+                  value={form.DS_GRANULARIDADE}
+                  onChange={(e) =>
+                    updateField("DS_GRANULARIDADE", e.target.value)
+                  }
+                  maxLength={150}
+                  placeholder="Ex.: Município, imóvel rural, ponto"
+                />
+              </CustomCol>
+            </CustomRow>
+          </CustomBox>
 
-              <FormField
-                name="CO_TEMA"
-                label="Tema"
-                value={form.CO_TEMA}
-                onChange={updateField}
-                options={getDominioOptions("TEMA_DADO")}
-              />
-
-              <FormField
-                name="NO_FORMATO"
-                label="Formato"
-                value={form.NO_FORMATO}
-                onChange={updateField}
-                maxLength={50}
-                placeholder="Ex.: CSV, GeoJSON, KML"
-              />
-
-              <FormField
-                name="DS_GRANULARIDADE"
-                label="Granularidade"
-                value={form.DS_GRANULARIDADE}
-                onChange={updateField}
-                maxLength={150}
-                placeholder="Ex.: Município, imóvel rural, ponto"
-              />
-            </div>
-          </FormSection>
-
-          <FormSection
+          <CustomBox
             icon={<Link2 size={19} />}
             title="Fonte e origem"
             description="Procedência, identificação e condições de acesso aos dados."
+            keepMounted
           >
-            <div className="edit-catalog__grid">
-              <FormField
-                name="NO_FONTE"
-                label="Fonte"
-                value={form.NO_FONTE}
-                onChange={updateField}
-                required
-                maxLength={200}
-                placeholder="Ex.: IBGE, ANA, INCRA"
-              />
-
-              <FormField
-                name="DS_ORIGEM"
-                label="Origem"
-                value={form.DS_ORIGEM}
-                onChange={updateField}
-                maxLength={255}
-                placeholder="Ex.: Base cartográfica oficial"
-              />
-
-              <FormField
-                name="DS_IDENTIFICADOR_ORIGEM"
-                label="Identificador na origem"
-                value={form.DS_IDENTIFICADOR_ORIGEM}
-                onChange={updateField}
-                maxLength={255}
-                placeholder="Código ou identificador original"
-              />
-
-              <FormField
-                name="DS_LICENCA"
-                label="Licença de uso"
-                value={form.DS_LICENCA}
-                onChange={updateField}
-                placeholder="Ex.: CC BY 4.0"
-              />
-
-              <div className="edit-catalog__full">
-                <FormField
+            <CustomRow>
+              <CustomCol>
+                <CustomInputText
+                  name="NO_FONTE"
+                  title="Fonte"
+                  value={form.NO_FONTE}
+                  onChange={(e) => updateField("NO_FONTE", e.target.value)}
+                  required
+                  maxLength={200}
+                  placeholder="Ex.: IBGE, ANA, INCRA"
+                />
+              </CustomCol>
+              <CustomCol>
+                <CustomInputText
+                  name="DS_ORIGEM"
+                  title="Origem"
+                  value={form.DS_ORIGEM}
+                  onChange={(e) => updateField("DS_ORIGEM", e.target.value)}
+                  maxLength={255}
+                  placeholder="Ex.: Base cartográfica oficial"
+                />
+              </CustomCol>
+            </CustomRow>
+            <CustomRow>
+              <CustomCol>
+                <CustomInputText
+                  name="DS_IDENTIFICADOR_ORIGEM"
+                  title="Identificador na origem"
+                  value={form.DS_IDENTIFICADOR_ORIGEM}
+                  onChange={(e) =>
+                    updateField("DS_IDENTIFICADOR_ORIGEM", e.target.value)
+                  }
+                  maxLength={255}
+                  placeholder="Código ou identificador original"
+                />
+              </CustomCol>
+              <CustomCol>
+                <CustomInputText
+                  name="DS_LICENCA"
+                  title="Licença de uso"
+                  value={form.DS_LICENCA}
+                  onChange={(e) => updateField("DS_LICENCA", e.target.value)}
+                  placeholder="Ex.: CC BY 4.0"
+                />
+              </CustomCol>
+            </CustomRow>
+            <CustomRow>
+              <CustomCol>
+                <CustomInputText
                   name="DS_URL_FONTE"
-                  label="URL da fonte"
+                  title="URL da fonte"
                   type="url"
                   value={form.DS_URL_FONTE}
-                  onChange={updateField}
+                  onChange={(e) => updateField("DS_URL_FONTE", e.target.value)}
                   placeholder="https://..."
                 />
-              </div>
-
-              <div className="edit-catalog__full">
-                <FormField
+              </CustomCol>
+            </CustomRow>
+            <CustomRow>
+              <CustomCol>
+                <CustomInputText
                   name="DS_URL_ACESSO"
-                  label="URL de acesso"
+                  title="URL de acesso"
                   type="url"
                   value={form.DS_URL_ACESSO}
-                  onChange={updateField}
+                  onChange={(e) => updateField("DS_URL_ACESSO", e.target.value)}
                   placeholder="https://..."
                   hint="Endereço para consulta ou obtenção dos dados."
                 />
-              </div>
-            </div>
-          </FormSection>
+              </CustomCol>
+            </CustomRow>
+          </CustomBox>
 
-          <FormSection
+          <CustomBox
             icon={<CalendarDays size={19} />}
             title="Atualização e referência"
             description="Periodicidade, atualização da fonte e período de referência."
+            keepMounted
           >
-            <div className="edit-catalog__grid">
-              <FormField
-                name="CO_PERIODICIDADE"
-                label="Periodicidade"
-                value={form.CO_PERIODICIDADE}
-                onChange={updateField}
-                options={getDominioOptions("PERIODICIDADE_DADO")}
-              />
+            <CustomRow>
+              <CustomCol>
+                <CustomSelect
+                  name="CO_PERIODICIDADE"
+                  title="Periodicidade"
+                  dominio="PERIODICIDADE_DADO"
+                  value={form.CO_PERIODICIDADE}
+                  onChange={(e) =>
+                    updateField("CO_PERIODICIDADE", e.target.value)
+                  }
+                />
+              </CustomCol>
+              <CustomCol>
+                <CustomInputDate
+                  name="DT_ULTIMA_BUSCA"
+                  title="Última busca"
+                  type="datetime-local"
+                  value={form.DT_ULTIMA_BUSCA}
+                  onChange={(e) =>
+                    updateField("DT_ULTIMA_BUSCA", e.target.value)
+                  }
+                />
+              </CustomCol>
+            </CustomRow>
+            <CustomRow>
+              <CustomCol width="calc(50% - 10px)">
+                <CustomInputDate
+                  name="DT_ATUALIZACAO_FONTE"
+                  title="Atualização da fonte"
+                  value={form.DT_ATUALIZACAO_FONTE}
+                  onChange={(e) =>
+                    updateField("DT_ATUALIZACAO_FONTE", e.target.value)
+                  }
+                />
+              </CustomCol>
+            </CustomRow>
+            <CustomRow>
+              <CustomCol>
+                <CustomInputDate
+                  name="DT_REFERENCIA_INICIO"
+                  title="Início da referência"
+                  value={form.DT_REFERENCIA_INICIO}
+                  max={form.DT_REFERENCIA_FIM || undefined}
+                  onChange={(e) =>
+                    updateField("DT_REFERENCIA_INICIO", e.target.value)
+                  }
+                />
+              </CustomCol>
+              <CustomCol>
+                <CustomInputDate
+                  name="DT_REFERENCIA_FIM"
+                  title="Fim da referência"
+                  value={form.DT_REFERENCIA_FIM}
+                  min={form.DT_REFERENCIA_INICIO || undefined}
+                  onChange={(e) =>
+                    updateField("DT_REFERENCIA_FIM", e.target.value)
+                  }
+                />
+              </CustomCol>
+            </CustomRow>
+          </CustomBox>
 
-              <FormField
-                name="DT_ULTIMA_BUSCA"
-                label="Última busca"
-                type="datetime-local"
-                value={form.DT_ULTIMA_BUSCA}
-                onChange={updateField}
-              />
-
-              <FormField
-                name="DT_ATUALIZACAO_FONTE"
-                label="Atualização da fonte"
-                type="date"
-                value={form.DT_ATUALIZACAO_FONTE}
-                onChange={updateField}
-              />
-
-              <div />
-
-              <FormField
-                name="DT_REFERENCIA_INICIO"
-                label="Início da referência"
-                type="date"
-                value={form.DT_REFERENCIA_INICIO}
-                onChange={updateField}
-              />
-
-              <FormField
-                name="DT_REFERENCIA_FIM"
-                label="Fim da referência"
-                type="date"
-                value={form.DT_REFERENCIA_FIM}
-                onChange={updateField}
-              />
-            </div>
-          </FormSection>
-
-          <FormSection
+          <CustomBox
             icon={<Globe2 size={19} />}
             title="Abrangência territorial"
             description="Cobertura geográfica representada pelo conjunto de dados."
+            keepMounted
           >
-            <div className="edit-catalog__grid">
-              <div className="edit-catalog__full">
-                <FormField
+            <CustomRow>
+              <CustomCol>
+                <CustomInputText
                   name="DS_ABRANGENCIA_TERRITORIAL"
-                  label="Abrangência territorial"
+                  title="Abrangência territorial"
+                  type="textArea"
+                  rows={3}
                   value={form.DS_ABRANGENCIA_TERRITORIAL}
-                  onChange={updateField}
-                  multiline
+                  onChange={(e) =>
+                    updateField("DS_ABRANGENCIA_TERRITORIAL", e.target.value)
+                  }
                   placeholder="Ex.: Estado do Tocantins, municípios do Polo..."
                 />
-              </div>
-            </div>
-          </FormSection>
+              </CustomCol>
+            </CustomRow>
+          </CustomBox>
 
-          <FormSection
+          <CustomBox
             icon={<Info size={19} />}
             title="Informações complementares"
             description="Limitações conhecidas e observações sobre os dados."
+            defaultOpen={false}
+            keepMounted
           >
-            <div className="edit-catalog__grid">
-              <div className="edit-catalog__full">
-                <FormField
+            <CustomRow>
+              <CustomCol>
+                <CustomInputText
                   name="DS_LIMITACOES"
-                  label="Limitações"
+                  title="Limitações"
+                  type="textArea"
+                  rows={3}
                   value={form.DS_LIMITACOES}
-                  onChange={updateField}
-                  multiline
+                  onChange={(e) => updateField("DS_LIMITACOES", e.target.value)}
                   placeholder="Descreva limitações metodológicas, espaciais ou temporais."
                 />
-              </div>
-
-              <div className="edit-catalog__full">
-                <FormField
+              </CustomCol>
+            </CustomRow>
+            <CustomRow>
+              <CustomCol>
+                <CustomInputText
                   name="DS_OBSERVACOES"
-                  label="Observações"
+                  title="Observações"
+                  type="textArea"
+                  rows={3}
                   value={form.DS_OBSERVACOES}
-                  onChange={updateField}
-                  multiline
+                  onChange={(e) =>
+                    updateField("DS_OBSERVACOES", e.target.value)
+                  }
                   placeholder="Informações adicionais relevantes."
                 />
-              </div>
-            </div>
-          </FormSection>
+              </CustomCol>
+            </CustomRow>
+          </CustomBox>
         </fieldset>
 
         <footer className="edit-catalog__actions">
@@ -641,11 +540,9 @@ export function EditCatalog({
               onClick={() => void handleDelete()}
               disabled={busy}
             >
-              <Trash2 size={17} />
-              {deleting ? "Inativando..." : "Inativar"}
+              <Trash2 size={17} /> {deleting ? "Inativando..." : "Inativar"}
             </button>
           )}
-
           <div className="edit-catalog__actions-right">
             <button
               type="button"
@@ -655,7 +552,6 @@ export function EditCatalog({
             >
               Cancelar
             </button>
-
             <button
               type="submit"
               className="edit-catalog__button edit-catalog__button--primary"
@@ -666,7 +562,6 @@ export function EditCatalog({
               ) : (
                 <Save size={17} />
               )}
-
               {saving
                 ? "Salvando..."
                 : isEditing

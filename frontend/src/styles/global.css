@@ -86,3 +86,15 @@ a:hover {
 ::-webkit-scrollbar-thumb:hover {
   background: #aab8c5;
 }
+
+/* Evita o cursor de texto em elementos não editáveis */
+body {
+  caret-color: transparent;
+}
+
+/* Preserva o cursor nos campos editáveis */
+input,
+textarea,
+[contenteditable="true"] {
+  caret-color: auto;
+}

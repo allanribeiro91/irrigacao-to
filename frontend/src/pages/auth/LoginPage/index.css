@@ -492,3 +492,14 @@
     gap: 10px;
   }
 }
+
+/* Remove o fundo automático dos campos preenchidos pelo navegador */
+.login-input input:-webkit-autofill,
+.login-input input:-webkit-autofill:hover,
+.login-input input:-webkit-autofill:focus,
+.login-input input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 1000px #ffffff inset !important;
+  -webkit-text-fill-color: #243047 !important;
+  caret-color: #243047;
+  transition: background-color 9999s ease-out 0s;
+}

@@ -1,0 +1,177 @@
+/* Container */
+
+.custom-input-text {
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* Label */
+
+.custom-input-text__label {
+  display: inline-flex;
+  width: fit-content;
+  align-items: center;
+  gap: 4px;
+  color: var(--color-text-primary, #243047);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+.custom-input-text__label--strong {
+  font-weight: 700;
+}
+
+.custom-input-text__required {
+  color: var(--color-danger, #dc2626);
+  font-weight: 700;
+}
+
+.custom-input-text__lock {
+  margin-left: 3px;
+  color: var(--color-text-muted, #748198);
+}
+
+/* Campo */
+
+.custom-input-text__control {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  min-height: 40px;
+  padding: 9px 12px;
+
+  border: 1px solid var(--color-border, #cbd5e1);
+  border-radius: 6px;
+
+  outline: none;
+  background: #ffffff;
+  color: var(--color-text-primary, #243047);
+
+  font: inherit;
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.5;
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background-color 0.2s ease;
+}
+
+.custom-input-text__control::placeholder {
+  color: var(--color-text-disabled, #a0aabb);
+  opacity: 1;
+}
+
+/* Hover */
+
+.custom-input-text__control:hover:not(:disabled):not(:read-only) {
+  border-color: var(--color-blue-300, #8ba0ff);
+}
+
+/* Foco */
+
+.custom-input-text__control:focus-visible {
+  border-color: var(--color-primary, #0f33d5);
+  box-shadow: 0 0 0 3px rgba(15, 51, 213, 0.12);
+}
+
+/* Textarea */
+
+textarea.custom-input-text__control {
+  min-height: 90px;
+  resize: vertical;
+}
+
+/* Alinhamento */
+
+.custom-input-text__control--left {
+  text-align: left;
+}
+
+.custom-input-text__control--center {
+  text-align: center;
+}
+
+.custom-input-text__control--right {
+  text-align: right;
+}
+
+/* Somente leitura */
+
+.custom-input-text__control--readonly {
+  border-color: #d9e0e8;
+  background: #f3f5f8;
+  color: #475569;
+  cursor: default;
+}
+
+/* Desabilitado */
+
+.custom-input-text__control--disabled {
+  border-color: #e2e8f0;
+  background: #f1f5f9;
+  color: #94a3b8;
+  cursor: not-allowed;
+  opacity: 0.75;
+}
+
+/* Estilos especiais */
+
+.custom-input-text__control--capital {
+  border-color: #ffa600;
+  background: #fdeec6;
+  color: #111827;
+  font-weight: 700;
+}
+
+.custom-input-text__control--dash {
+  border-color: #000e8f;
+  background: #cdd6ff;
+  color: #111827;
+  font-weight: 700;
+}
+
+.custom-input-text__control--bold {
+  font-weight: 700;
+}
+
+/* Erro de validação */
+
+.custom-input-text__control--error,
+.custom-input-text__control--error:hover:not(:disabled) {
+  border-color: var(--color-danger, #dc2626);
+}
+
+.custom-input-text__control--error:focus-visible {
+  border-color: var(--color-danger, #dc2626);
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.12);
+}
+
+.custom-input-text__error {
+  color: var(--color-danger, #dc2626);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+/* Texto auxiliar */
+
+.custom-input-text__hint {
+  color: var(--color-text-muted, #748198);
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+/* Autofill do navegador */
+
+.custom-input-text__control:-webkit-autofill,
+.custom-input-text__control:-webkit-autofill:hover,
+.custom-input-text__control:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0 1000px #ffffff inset;
+  -webkit-text-fill-color: #243047;
+  caret-color: #243047;
+}

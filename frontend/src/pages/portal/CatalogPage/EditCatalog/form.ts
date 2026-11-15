@@ -31,34 +31,6 @@ export const initialCatalogForm: CatalogFormData = {
   DS_OBSERVACOES: "",
 };
 
-export const tipoDadoOptions = [
-  { value: 10, label: "Tabular" },
-  { value: 11, label: "Geoespacial vetorial" },
-  { value: 12, label: "Geoespacial raster" },
-  { value: 13, label: "Documental" },
-];
-
-export const temaOptions = [
-  { value: 15, label: "Recursos hídricos" },
-  { value: 16, label: "Agropecuária e irrigação" },
-  { value: 17, label: "Fundiário" },
-  { value: 18, label: "Meio ambiente" },
-  { value: 19, label: "Infraestrutura" },
-  { value: 20, label: "Socioeconomia e demografia" },
-];
-
-export const periodicidadeOptions = [
-  { value: 22, label: "Diária" },
-  { value: 23, label: "Semanal" },
-  { value: 24, label: "Mensal" },
-  { value: 25, label: "Trimestral" },
-  { value: 26, label: "Semestral" },
-  { value: 27, label: "Anual" },
-  { value: 28, label: "Decenal" },
-  { value: 29, label: "Eventual" },
-  { value: 30, label: "Não informada" },
-];
-
 const toStringValue = (value: string | number | null | undefined): string => {
   if (value === null || value === undefined) {
     return "";

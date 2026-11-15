@@ -1,0 +1,245 @@
+/* Container */
+
+.custom-select {
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* Cabeçalho */
+
+.custom-select__header {
+  display: flex;
+  min-height: 18px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+/* Label */
+
+.custom-select__label {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+
+  color: var(--color-text-primary, #243047);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+.custom-select__label--strong {
+  font-weight: 700;
+}
+
+.custom-select__required {
+  color: var(--color-danger, #dc2626);
+  font-weight: 700;
+}
+
+.custom-select__lock {
+  margin-left: 3px;
+  color: var(--color-text-muted, #748198);
+}
+
+/* Wrapper */
+
+.custom-select__wrapper {
+  position: relative;
+  width: 100%;
+  min-width: 0;
+}
+
+/* Select */
+
+.custom-select__control {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  min-height: 40px;
+
+  padding: 9px 36px 9px 12px;
+
+  appearance: none;
+  -webkit-appearance: none;
+
+  border: 1px solid var(--color-border, #cbd5e1);
+  border-radius: 6px;
+
+  outline: none;
+
+  background: #ffffff;
+  color: var(--color-text-primary, #243047);
+
+  font: inherit;
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.5;
+
+  cursor: pointer;
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background-color 0.2s ease;
+}
+
+/* Hover */
+
+.custom-select__control:hover:not(:disabled) {
+  border-color: var(--color-blue-300, #8ba0ff);
+}
+
+/* Foco */
+
+.custom-select__control:focus-visible {
+  border-color: var(--color-primary, #0f33d5);
+
+  box-shadow: 0 0 0 3px rgba(15, 51, 213, 0.12);
+}
+
+/* Seta */
+
+.custom-select__chevron {
+  position: absolute;
+  top: 50%;
+  right: 12px;
+
+  color: var(--color-text-muted, #748198);
+
+  pointer-events: none;
+
+  transform: translateY(-50%);
+}
+
+.custom-select__control:focus-visible + .custom-select__chevron {
+  color: var(--color-primary, #0f33d5);
+}
+
+/* Desabilitado */
+
+.custom-select__control--disabled {
+  border-color: #e2e8f0;
+  background: #f1f5f9;
+  color: #94a3b8;
+
+  cursor: not-allowed;
+  opacity: 0.75;
+}
+
+/* Erro */
+
+.custom-select__control--error,
+.custom-select__control--error:hover:not(:disabled) {
+  border-color: var(--color-danger, #dc2626);
+}
+
+.custom-select__control--error:focus-visible {
+  border-color: var(--color-danger, #dc2626);
+
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.12);
+}
+
+.custom-select__error {
+  color: var(--color-danger, #dc2626);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+/* Ajuda */
+
+.custom-select__help {
+  position: relative;
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+}
+
+.custom-select__help-button {
+  display: grid;
+  width: 22px;
+  height: 22px;
+
+  padding: 0;
+  place-items: center;
+
+  border: 0;
+  border-radius: 50%;
+
+  background: transparent;
+  color: var(--color-text-muted, #748198);
+
+  cursor: help;
+
+  transition:
+    color 0.2s ease,
+    background-color 0.2s ease;
+}
+
+.custom-select__help-button:hover,
+.custom-select__help-button:focus-visible {
+  background: var(--color-blue-50, #edf0ff);
+  color: var(--color-primary, #0f33d5);
+}
+
+/* Tooltip */
+
+.custom-select__tooltip {
+  position: absolute;
+  z-index: 1000;
+
+  top: calc(100% + 8px);
+  right: 0;
+
+  width: max-content;
+  max-width: min(280px, 80vw);
+
+  padding: 10px 12px;
+
+  border-radius: 6px;
+
+  background: #1f2937;
+  color: #ffffff;
+
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.5;
+
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.16);
+
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+
+  transform: translateY(-4px);
+
+  transition:
+    opacity 0.15s ease,
+    transform 0.15s ease,
+    visibility 0.15s ease;
+}
+
+/* Seta do tooltip */
+
+.custom-select__tooltip::before {
+  position: absolute;
+  right: 7px;
+  bottom: 100%;
+
+  content: "";
+
+  border: 5px solid transparent;
+  border-bottom-color: #1f2937;
+}
+
+/* Exibição */
+
+.custom-select__help:hover .custom-select__tooltip,
+.custom-select__help:focus-within .custom-select__tooltip {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}

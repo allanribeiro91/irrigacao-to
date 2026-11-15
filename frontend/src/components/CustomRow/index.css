@@ -1,0 +1,18 @@
+.custom-row {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+
+  width: 100%;
+  min-width: 0;
+
+  align-items: flex-start;
+  justify-content: flex-start;
+
+  gap: 20px;
+  margin-bottom: 15px;
+}
+
+.custom-row:last-child {
+  margin-bottom: 0;
+}

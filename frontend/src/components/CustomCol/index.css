@@ -1,0 +1,13 @@
+.custom-col {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+}
+
+.custom-col__help {
+  margin-top: 5px;
+
+  color: var(--color-text-muted, #748198);
+  font-size: 11px;
+  line-height: 1.5;
+}
