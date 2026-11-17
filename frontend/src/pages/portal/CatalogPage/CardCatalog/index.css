@@ -1,22 +1,21 @@
 .card-catalog {
   display: flex;
   align-items: center;
-  gap: 18px;
+  gap: 12px;
 
   width: 100%;
   min-width: 0;
 
-  padding: 18px 20px;
+  padding: 12px 16px;
 
   border: 1px solid var(--color-border-subtle);
-  border-radius: 10px;
+  border-radius: 8px;
 
   background: var(--color-surface);
   color: var(--color-text-primary);
 
   text-align: left;
   font: inherit;
-
   cursor: pointer;
 
   transition:
@@ -28,7 +27,7 @@
 .card-catalog:hover {
   border-color: var(--color-primary-border);
   background: var(--color-primary-subtle);
-  box-shadow: 0 3px 12px rgba(15, 23, 42, 0.04);
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
 }
 
 .card-catalog:focus-visible {
@@ -36,87 +35,181 @@
   outline-offset: 2px;
 }
 
+/* =========================================================
+   ÍCONE
+   ========================================================= */
+
 .card-catalog__icon {
   display: flex;
   align-items: center;
   justify-content: center;
 
-  flex: 0 0 48px;
+  flex: 0 0 40px;
 
-  width: 48px;
-  height: 48px;
+  width: 40px;
+  height: 40px;
 
-  border-radius: 10px;
+  border-radius: 8px;
 
   background: var(--color-primary-subtle);
   color: var(--color-primary);
 }
 
-.card-catalog__content {
+/* =========================================================
+   CONTEÚDO
+   ========================================================= */
+
+.card-catalog__body {
   display: flex;
   flex: 1;
   flex-direction: column;
-  gap: 7px;
+  gap: 5px;
 
   min-width: 0;
 }
 
+.card-catalog__header {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+
 .card-catalog__title {
-  font-size: 14px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  font-size: 13px;
   font-weight: 650;
   line-height: 1.4;
 }
 
 .card-catalog__description {
-  display: -webkit-box;
-
   overflow: hidden;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
-  line-clamp: 2;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 
   color: var(--color-text-secondary);
 
-  font-size: 12px;
-  line-height: 1.6;
+  font-size: 11.5px;
+  line-height: 1.5;
 }
 
+/* =========================================================
+   RODAPÉ
+   ========================================================= */
+
+.card-catalog__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+
+  margin-top: 3px;
+}
+
+.card-catalog__tags,
 .card-catalog__metadata {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 8px 18px;
-
-  margin-top: 3px;
-
-  color: var(--color-text-muted);
-  font-size: 11px;
+  gap: 6px;
 }
 
-.card-catalog__metadata > span {
+.card-catalog__tag {
   display: inline-flex;
   align-items: center;
   gap: 5px;
+
+  padding: 3px 7px;
+
+  border: 1px solid var(--color-border-subtle);
+  border-radius: 4px;
+
+  background: var(--color-surface);
+  color: var(--color-text-secondary);
+
+  font-size: 10px;
+  font-weight: 500;
+  line-height: 1.3;
 }
+
+.card-catalog__metadata {
+  gap: 8px 14px;
+}
+
+.card-catalog__metadata-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+
+  color: var(--color-text-muted);
+
+  font-size: 10.5px;
+  line-height: 1.4;
+
+  white-space: nowrap;
+}
+
+.card-catalog__metadata-item svg {
+  flex-shrink: 0;
+}
+
+/* =========================================================
+   SETA
+   ========================================================= */
 
 .card-catalog__arrow {
   flex-shrink: 0;
   color: var(--color-text-muted);
+  transition:
+    color 180ms ease,
+    transform 180ms ease;
 }
 
 .card-catalog:hover .card-catalog__arrow {
   color: var(--color-primary);
+  transform: translateX(2px);
+}
+
+/* =========================================================
+   RESPONSIVIDADE
+   ========================================================= */
+
+@media (max-width: 900px) {
+  .card-catalog__footer {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 7px;
+  }
 }
 
 @media (max-width: 680px) {
   .card-catalog {
-    gap: 12px;
-    padding: 14px;
+    gap: 10px;
+    padding: 11px 12px;
   }
 
   .card-catalog__icon {
-    flex-basis: 40px;
-    width: 40px;
-    height: 40px;
+    flex-basis: 36px;
+    width: 36px;
+    height: 36px;
+  }
+
+  .card-catalog__title {
+    font-size: 12px;
+  }
+
+  .card-catalog__description {
+    font-size: 11px;
+  }
+
+  .card-catalog__metadata {
+    gap: 6px 10px;
+  }
+
+  .card-catalog__arrow {
+    width: 16px;
   }
 }

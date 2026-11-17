@@ -1,82 +1,3 @@
-.register-page {
-  position: relative;
-  display: grid;
-  grid-template-rows: auto minmax(0, 1fr);
-  min-height: 100vh;
-  min-height: 100dvh;
-  isolation: isolate;
-  background:
-    radial-gradient(
-      circle at 12% 15%,
-      rgba(15, 51, 213, 0.075),
-      transparent 35%
-    ),
-    radial-gradient(
-      circle at 80% 85%,
-      rgba(69, 156, 33, 0.045),
-      transparent 35%
-    ),
-    var(--color-background, #f8fcfe);
-  color: var(--color-text-primary, #243047);
-}
-
-.register-page::before {
-  position: absolute;
-  inset: 0;
-  content: "";
-  pointer-events: none;
-  background-image:
-    linear-gradient(rgba(15, 51, 213, 0.028) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(15, 51, 213, 0.028) 1px, transparent 1px);
-  background-size: 64px 64px;
-}
-
-.register-background {
-  position: absolute;
-  inset: 0;
-  overflow: hidden;
-  pointer-events: none;
-  z-index: -1;
-}
-
-.register-background__sun {
-  position: absolute;
-  top: 8%;
-  left: 54%;
-  width: 320px;
-  height: 320px;
-  border-radius: 50%;
-  border: 1px solid rgba(220, 147, 5, 0.11);
-  background: radial-gradient(
-    circle,
-    rgba(247, 181, 21, 0.065),
-    transparent 72%
-  );
-}
-
-.register-background__terrain {
-  position: absolute;
-  inset: auto 0 0;
-  width: 100%;
-  height: 80%;
-}
-
-.register-terrain-line,
-.register-contour-line {
-  fill: none;
-  vector-effect: non-scaling-stroke;
-}
-
-.register-terrain-line--blue {
-  stroke: rgba(15, 51, 213, 0.18);
-  stroke-width: 2;
-}
-
-.register-terrain-line--green {
-  stroke: rgba(69, 156, 33, 0.13);
-  stroke-width: 1.5;
-}
-
 .register-contour-line {
   stroke: rgba(15, 51, 213, 0.075);
   stroke-width: 1;
@@ -84,18 +5,18 @@
 
 .register-header {
   position: relative;
-  z-index: 1;
+  z-index: 2;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  padding: 28px clamp(20px, 5vw, 80px) 0;
+  padding: 36px clamp(24px, 5vw, 88px) 0;
 }
 
 .register-brand {
   display: flex;
   align-items: center;
-  gap: 13px;
+  gap: 15px;
   min-width: 0;
   color: var(--color-text-primary, #243047);
   text-decoration: none;
@@ -105,12 +26,13 @@
   display: grid;
   flex-shrink: 0;
   place-items: center;
-  width: 48px;
-  height: 48px;
-  border-radius: 12px;
+  width: 51px;
+  height: 51px;
+  border: 1px solid var(--color-blue-200, #b9c5ff);
+  border-radius: 14px;
+  background: var(--color-blue-50, #edf0ff);
   color: var(--color-primary, #0f33d5);
-  background: var(--color-primary-subtle, #edf0ff);
-  border: 1px solid var(--color-primary-border, #b9c5ff);
+  box-shadow: var(--shadow-sm);
 }
 
 .register-brand__text {
@@ -122,15 +44,21 @@
 
 .register-brand__text small {
   color: var(--color-primary, #0f33d5);
-  font-size: 9px;
+  font-size: 10px;
   font-weight: 700;
-  letter-spacing: 0.09em;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
 }
 
 .register-brand__text strong {
-  font-size: 15px;
+  color: var(--color-text-primary, #243047);
+  font-size: 16px;
   font-weight: 700;
+}
+
+.register-brand__text > span:last-child {
+  color: var(--color-text-secondary, #526078);
+  font-size: 12px;
 }
 
 .register-brand__text span {
@@ -391,4 +319,12 @@
   .register-form__row {
     grid-template-columns: minmax(0, 1fr);
   }
+}
+
+.register-content {
+  min-height: 0;
+}
+
+.register-card {
+  box-sizing: border-box;
 }

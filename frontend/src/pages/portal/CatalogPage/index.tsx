@@ -1,155 +1,106 @@
 import { useEffect, useMemo, useState } from "react";
-
-import {
-  Database,
-  LoaderCircle,
-  Pencil,
-  Plus,
-  RefreshCw,
-  Search,
-} from "lucide-react";
-
+import { Database, LoaderCircle, Pencil, Plus, Search } from "lucide-react";
 import { CustomOffcanvas } from "../../../components/CustomOffcanvas";
-import { getHttpErrorMessage } from "../../../services/httpClient";
-
+import { getApiErrorMessage, isApiCancel } from "../../../api/client";
+import { useUser } from "../../../providers/UserProvider/context";
 import { CardCatalog } from "./CardCatalog";
 import { ViewCatalog } from "./ViewCatalog";
 import { EditCatalog } from "./EditCatalog";
-
-import { getCatalog, getCatalogById } from "./service";
-
 import type { CatalogData } from "./type";
-
+import { apiGet } from "../../../api/requests/get";
+import API_PATHS from "../../../api/paths";
 import "./index.css";
-import { useUser } from "../../../providers/UserProvider/context";
 
 type CatalogMode = "view" | "edit" | "create";
 
 export function CatalogPage() {
+  const { isAdmin } = useUser();
+  const canManageCatalog = isAdmin;
+
+  // =========================================================
+  // LISTAGEM
+  // =========================================================
   const [items, setItems] = useState<CatalogData[]>([]);
   const [search, setSearch] = useState("");
-
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const [selectedCatalog, setSelectedCatalog] = useState<CatalogData | null>(
-    null,
-  );
-
+  // =========================================================
+  // OFFCANVAS
+  // =========================================================
+  const [panelOpen, setPanelOpen] = useState(false);
   const [selectedId, setSelectedId] = useState<number | null>(null);
-
   const [mode, setMode] = useState<CatalogMode>("view");
 
-  const [detailsLoading, setDetailsLoading] = useState(false);
-  const [detailsError, setDetailsError] = useState<string | null>(null);
-
-  const [panelOpen, setPanelOpen] = useState(false);
-
-  // Integrar com as permissões reais do usuário.
-  // A API também deve validar essas permissões.
-  const { isAdmin } = useUser();
-
-  const canManageCatalog = isAdmin;
-
-  // O container é o box principal da workspace.
   const overlayContainer =
     typeof document !== "undefined"
       ? document.querySelector<HTMLElement>(".l-workspace__content")
       : null;
 
-  async function loadCatalog(showLoading = true) {
+  // =========================================================
+  // RECARREGAR CATÁLOGO
+  // =========================================================
+  async function refreshCatalog() {
     try {
-      if (showLoading) {
-        setLoading(true);
-        setError(null);
-      }
-
-      const data = await getCatalog({
-        offset: 0,
-        limit: 100,
+      const data = await apiGet<CatalogData[]>(API_PATHS.CATALOG.LIST, {
+        params: {
+          offset: 0,
+          limit: 100,
+        },
       });
 
       setItems(data);
       setError(null);
     } catch (err) {
       setError(
-        getHttpErrorMessage(err, "Não foi possível carregar o catálogo."),
+        getApiErrorMessage(err, "Não foi possível atualizar o catálogo."),
       );
-    } finally {
-      setLoading(false);
     }
   }
 
+  // =========================================================
+  // GET ALL - CARREGAMENTO INICIAL
+  // =========================================================
   useEffect(() => {
-    let active = true;
+    const controller = new AbortController();
 
-    async function load() {
+    async function loadCatalog() {
       try {
-        const data = await getCatalog({
-          offset: 0,
-          limit: 100,
+        const data = await apiGet<CatalogData[]>(API_PATHS.CATALOG.LIST, {
+          params: {
+            offset: 0,
+            limit: 100,
+          },
+          signal: controller.signal,
         });
 
-        if (active) {
-          setItems(data);
-          setError(null);
-        }
+        if (controller.signal.aborted) return;
+
+        setItems(data);
+        setError(null);
       } catch (err) {
-        if (active) {
-          setError(
-            getHttpErrorMessage(err, "Não foi possível carregar o catálogo."),
-          );
-        }
+        if (controller.signal.aborted || isApiCancel(err)) return;
+
+        setError(
+          getApiErrorMessage(err, "Não foi possível carregar o catálogo."),
+        );
       } finally {
-        if (active) {
+        if (!controller.signal.aborted) {
           setLoading(false);
         }
       }
     }
 
-    void load();
+    void loadCatalog();
 
     return () => {
-      active = false;
+      controller.abort();
     };
   }, []);
 
-  // Consulta os metadados completos do item selecionado.
-  useEffect(() => {
-    if (!panelOpen || mode === "create" || selectedId === null) {
-      return;
-    }
-
-    let active = true;
-
-    async function loadDetails() {
-      try {
-        setDetailsLoading(true);
-        setDetailsError(null);
-
-        const data = await getCatalogById(selectedId!);
-
-        if (active) {
-          setSelectedCatalog(data);
-        }
-      } catch (err) {
-        if (active) {
-          setDetailsError(
-            getHttpErrorMessage(err, "Não foi possível carregar os detalhes."),
-          );
-        }
-      } finally {
-        if (active) setDetailsLoading(false);
-      }
-    }
-
-    void loadDetails();
-
-    return () => {
-      active = false;
-    };
-  }, [panelOpen, selectedId, mode === "create"]);
-
+  // =========================================================
+  // FILTRO LOCAL
+  // =========================================================
   const filteredItems = useMemo(() => {
     const term = search.trim().toLocaleLowerCase("pt-BR");
 
@@ -169,60 +120,50 @@ export function CatalogPage() {
     );
   }, [items, search]);
 
+  // =========================================================
+  // AÇÕES DO OFFCANVAS
+  // =========================================================
   function openCatalog(catalog: CatalogData) {
-    setSelectedCatalog(catalog);
     setSelectedId(catalog.CO_SEQ_CATALOGO_DADO);
     setMode("view");
-    setDetailsError(null);
     setPanelOpen(true);
   }
 
   function openCreate() {
     if (!canManageCatalog) return;
 
-    setSelectedCatalog(null);
     setSelectedId(null);
     setMode("create");
-    setDetailsError(null);
     setPanelOpen(true);
   }
 
   function closePanel() {
     setPanelOpen(false);
     setMode("view");
+    setSelectedId(null);
   }
 
-  async function handleSaved() {
-    await loadCatalog();
-
-    if (mode === "create") {
-      closePanel();
-      return;
-    }
-
-    if (selectedId !== null) {
-      const updated = await getCatalogById(selectedId);
-      setSelectedCatalog(updated);
-    }
-
-    setMode("view");
-  }
-
-  async function handleDeleted() {
-    closePanel();
-    await loadCatalog();
-  }
+  // =========================================================
+  // CONFIGURAÇÃO DO OFFCANVAS
+  // =========================================================
+  const selectedItem = items.find(
+    (item) => item.CO_SEQ_CATALOGO_DADO === selectedId,
+  );
 
   const panelTitle =
     mode === "create"
       ? "Novo conjunto de dados"
       : mode === "edit"
         ? "Editar conjunto de dados"
-        : (selectedCatalog?.NO_CONJUNTO_DADO ?? "Conjunto de dados");
+        : (selectedItem?.NO_CONJUNTO_DADO ?? "Conjunto de dados");
 
+  // =========================================================
+  // RENDER
+  // =========================================================
   return (
     <section className="catalog-page">
       {/* FILTROS E AÇÕES */}
+
       <div className="catalog-page__toolbar">
         <label className="catalog-page__search">
           <Search size={18} aria-hidden="true" />
@@ -237,16 +178,6 @@ export function CatalogPage() {
         </label>
 
         <div className="catalog-page__toolbar-actions">
-          <button
-            type="button"
-            className="catalog-page__secondary-button"
-            onClick={() => void loadCatalog()}
-            disabled={loading}
-          >
-            <RefreshCw size={17} />
-            Atualizar
-          </button>
-
           {canManageCatalog && (
             <button
               type="button"
@@ -260,12 +191,14 @@ export function CatalogPage() {
         </div>
       </div>
 
+      {/* ERRO */}
       {error && (
         <div className="catalog-page__error" role="alert">
           {error}
         </div>
       )}
 
+      {/* LISTAGEM */}
       {loading ? (
         <div className="catalog-page__state">
           <LoaderCircle size={22} className="catalog-page__spin" />
@@ -288,55 +221,46 @@ export function CatalogPage() {
         </div>
       )}
 
-      <footer className="catalog-page__footer">
-        {filteredItems.length} registros exibidos
-      </footer>
-
+      {/* OFFCANVAS */}
       <CustomOffcanvas
         open={panelOpen}
         onClose={closePanel}
         container={overlayContainer}
-        width={"60vw"}
+        width="60vw"
         title={panelTitle}
         subtitle="Catálogo de dados"
-        footer={
-          mode === "view" && selectedCatalog && canManageCatalog ? (
+        headerActions={
+          mode === "view" && selectedId !== null && canManageCatalog ? (
             <button
               type="button"
-              className="catalog-page__primary-button"
+              className="catalog-page__edit-button"
               onClick={() => setMode("edit")}
+              title="Editar conjunto de dados"
+              aria-label="Editar conjunto de dados"
             >
-              <Pencil size={16} />
-              Editar conjunto de dados
+              <Pencil size={17} strokeWidth={1.8} />
             </button>
           ) : undefined
         }
       >
-        {mode === "create" || mode === "edit" ? (
-          canManageCatalog ? (
-            <EditCatalog
-              catalog={mode === "edit" ? selectedCatalog : null}
-              embedded
-              onCancel={() => {
-                if (mode === "create") {
-                  closePanel();
-                } else {
-                  setMode("view");
-                }
-              }}
-              onSaved={() => void handleSaved()}
-              onDeleted={() => void handleDeleted()}
-            />
-          ) : null
-        ) : detailsLoading ? (
-          <div className="catalog-page__state">Carregando detalhes...</div>
-        ) : detailsError ? (
-          <div className="catalog-page__error" role="alert">
-            {detailsError}
-          </div>
-        ) : selectedCatalog ? (
-          <ViewCatalog catalog={selectedCatalog} />
-        ) : null}
+        {/* VISUALIZAÇÃO */}
+        {mode === "view" && selectedId !== null && (
+          <ViewCatalog key={`view-${selectedId}`} catalogId={selectedId} />
+        )}
+
+        {/* CADASTRO OU EDIÇÃO */}
+        {(mode === "create" || mode === "edit") && canManageCatalog && (
+          <EditCatalog
+            key={
+              mode === "create"
+                ? "catalog-create"
+                : `catalog-edit-${selectedId}`
+            }
+            catalogId={mode === "edit" ? selectedId : null}
+            onSaved={refreshCatalog}
+            onClose={closePanel}
+          />
+        )}
       </CustomOffcanvas>
     </section>
   );

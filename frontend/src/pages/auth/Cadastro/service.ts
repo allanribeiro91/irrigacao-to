@@ -1,6 +1,5 @@
-// src/services/usuarioService.ts
-
-import httpClient from "../../../services/httpClient";
+import { apiPost } from "../../../api/requests/post";
+import API_PATHS from "../../../api/paths";
 
 export interface UsuarioCreate {
   co_cpf: string;
@@ -23,7 +22,8 @@ export interface UsuarioResponse {
 export const criarUsuario = async (
   payload: UsuarioCreate,
 ): Promise<UsuarioResponse> => {
-  const response = await httpClient.post<UsuarioResponse>("/usuarios", payload);
-
-  return response.data;
+  return apiPost<UsuarioResponse, UsuarioCreate>(
+    API_PATHS.AUTH.REGISTER,
+    payload,
+  );
 };

@@ -1,7 +1,6 @@
 import { useEffect, useId, useRef, useState, type ReactNode } from "react";
 
 import { createPortal } from "react-dom";
-import { X } from "lucide-react";
 
 import "./index.css";
 
@@ -15,6 +14,7 @@ interface CustomOffcanvasProps {
   footer?: ReactNode;
   container?: HTMLElement | null;
   closeDisabled?: boolean;
+  headerActions?: React.ReactNode;
 }
 
 export function CustomOffcanvas({
@@ -27,6 +27,7 @@ export function CustomOffcanvas({
   footer,
   container,
   closeDisabled = false,
+  headerActions,
 }: CustomOffcanvasProps) {
   const titleId = useId();
 
@@ -123,17 +124,7 @@ export function CustomOffcanvas({
 
             <h2 id={titleId}>{title}</h2>
           </div>
-
-          <button
-            ref={closeButtonRef}
-            type="button"
-            className="custom-offcanvas__close"
-            onClick={handleClose}
-            disabled={closeDisabled}
-            aria-label="Fechar painel"
-          >
-            <X size={20} />
-          </button>
+          {headerActions}
         </header>
 
         <div className="custom-offcanvas__body">{children}</div>

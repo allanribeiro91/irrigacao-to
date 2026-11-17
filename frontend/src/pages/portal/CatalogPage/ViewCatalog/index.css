@@ -1,88 +1,263 @@
+/* =========================================================
+   CONTAINER
+   ========================================================= */
+
 .view-catalog {
   display: flex;
   flex-direction: column;
-  gap: 28px;
 
   width: 100%;
   min-width: 0;
+
+  padding: 16px 20px;
+
+  border: 1px solid var(--color-border-subtle);
+  border-radius: 10px;
+
+  background: var(--color-surface);
+
+  box-sizing: border-box;
 }
+
+/* =========================================================
+   SEÇÕES
+   ========================================================= */
 
 .view-catalog__section {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 10px;
 
   min-width: 0;
+  padding: 13px 0;
+}
+
+.view-catalog__section:first-child {
+  padding-top: 0;
+}
+
+.view-catalog__section:last-child {
+  padding-bottom: 0;
 }
 
 .view-catalog__section + .view-catalog__section {
-  padding-top: 24px;
   border-top: 1px solid var(--color-border-subtle);
 }
+
+/* =========================================================
+   TÍTULOS DAS SEÇÕES
+   ========================================================= */
 
 .view-catalog__section-title {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
 
   margin: 0;
 
   color: var(--color-primary);
 
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 650;
+  line-height: 1.4;
 }
+
+.view-catalog__section-title svg {
+  flex-shrink: 0;
+  stroke-width: 1.8;
+}
+
+/* =========================================================
+   GRID
+   ========================================================= */
 
 .view-catalog__grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 18px;
+  align-items: start;
+
+  gap: 10px 18px;
+
+  width: 100%;
+  min-width: 0;
 }
+
+.view-catalog__grid--2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.view-catalog__grid--3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+/* =========================================================
+   CAMPOS
+   ========================================================= */
 
 .view-catalog__field {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 3px;
 
   min-width: 0;
 }
 
+.view-catalog__field--full {
+  grid-column: 1 / -1;
+}
+
+/* =========================================================
+   LABELS
+   ========================================================= */
+
 .view-catalog__label {
   color: var(--color-text-muted);
 
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
+  line-height: 1.4;
 }
+
+/* =========================================================
+   VALORES
+   ========================================================= */
 
 .view-catalog__value {
   color: var(--color-text-primary);
 
-  font-size: 12px;
-  line-height: 1.7;
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.5;
+
   white-space: pre-wrap;
   overflow-wrap: anywhere;
 }
 
-.view-catalog__field a {
+.view-catalog__value--empty {
+  color: var(--color-text-muted);
+  font-style: italic;
+}
+
+/* =========================================================
+   LINKS
+   ========================================================= */
+
+.view-catalog__link {
   display: inline-flex;
   align-items: center;
   gap: 6px;
 
   width: fit-content;
   max-width: 100%;
+  min-width: 0;
 
   color: var(--color-primary);
 
-  font-size: 12px;
+  font-size: 13px;
+  line-height: 1.5;
+
   text-decoration: none;
 }
 
-.view-catalog__field a:hover {
+.view-catalog__link-text {
+  display: block;
+
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.view-catalog__link svg {
+  flex-shrink: 0;
+}
+
+.view-catalog__link:hover {
   text-decoration: underline;
 }
 
+/* =========================================================
+   LOADING / EMPTY
+   ========================================================= */
+
+.view-catalog__loading,
+.view-catalog__empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+
+  min-height: 140px;
+
+  color: var(--color-text-muted);
+  font-size: 13px;
+
+  text-align: center;
+}
+
+.view-catalog__spin {
+  color: var(--color-primary);
+  animation: view-catalog-spin 0.9s linear infinite;
+}
+
+@keyframes view-catalog-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* =========================================================
+   ERRO
+   ========================================================= */
+
+.view-catalog__error {
+  padding: 12px 14px;
+
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+
+  background: #fff1f2;
+  color: var(--color-danger, #dc2626);
+
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+/* =========================================================
+   RESPONSIVIDADE
+   ========================================================= */
+
+@media (max-width: 900px) {
+  .view-catalog__grid--3 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
 @media (max-width: 680px) {
-  .view-catalog__grid {
+  .view-catalog {
+    padding: 12px 14px;
+    border-radius: 8px;
+  }
+
+  .view-catalog__section {
+    gap: 9px;
+    padding: 12px 0;
+  }
+
+  .view-catalog__grid--2,
+  .view-catalog__grid--3 {
     grid-template-columns: minmax(0, 1fr);
+    gap: 10px;
+  }
+
+  .view-catalog__section-title {
+    font-size: 13px;
+  }
+
+  .view-catalog__label {
+    font-size: 12px;
+  }
+
+  .view-catalog__value,
+  .view-catalog__link {
+    font-size: 13px;
   }
 }

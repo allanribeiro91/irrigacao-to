@@ -56,7 +56,7 @@ def create(
     return CatalogoDadoService.create(
         db=db,
         dados=payload,
-        usuario_id=usuario_atual.CO_SEQ_USUARIO,
+        usuario_id=usuario_atual.co_seq_usuario,
     )
 
 
@@ -75,7 +75,7 @@ def update(
         db=db,
         catalogo_id=catalogo_id,
         dados=payload,
-        usuario_id=usuario_atual.CO_SEQ_USUARIO,
+        usuario_id=usuario_atual.co_seq_usuario,
     )
 
 
@@ -92,7 +92,7 @@ def delete(
     CatalogoDadoService.delete(
         db=db,
         catalogo_id=catalogo_id,
-        usuario_id=usuario_atual.CO_SEQ_USUARIO,
+        usuario_id=usuario_atual.co_seq_usuario,
     )
 
     return Response(

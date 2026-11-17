@@ -9,11 +9,12 @@ import {
   LockKeyhole,
 } from "lucide-react";
 import { login } from "./service";
-import { getHttpErrorMessage } from "../../../services/httpClient";
+import { getApiErrorMessage } from "../../../api/client";
 import { somenteNumeros } from "../../../utils/somenteNumeros";
 import { formatarCpf } from "../../../utils/formatarCpf";
 import { useUser } from "../../../providers/UserProvider/context";
 import "./index.css";
+import { AuthBackground } from "../../../components/AuthBackground";
 
 export function LoginPage() {
   const navigate = useNavigate();
@@ -26,17 +27,20 @@ export function LoginPage() {
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+
     setErro(null);
     setLoading(true);
+
     try {
       const resultado = await login({
         co_cpf: somenteNumeros(coCpf),
         ds_senha: dsSenha,
       });
+
       setUserSession(resultado);
       navigate("/portal/geografico");
     } catch (error) {
-      setErro(getHttpErrorMessage(error, "CPF ou senha inválidos."));
+      setErro(getApiErrorMessage(error, "CPF ou senha inválidos."));
     } finally {
       setLoading(false);
     }
@@ -44,59 +48,7 @@ export function LoginPage() {
 
   return (
     <main className="login-page">
-      <div className="login-background" aria-hidden="true">
-        <div className="login-background__sun" />
-        <svg
-          className="login-background__terrain"
-          viewBox="0 0 1600 900"
-          preserveAspectRatio="none"
-        >
-          <path
-            d="M-80 690 C180 560 310 780 560 650 C790 530 930 650 1170 560 C1370 485 1510 560 1690 470"
-            className="login-terrain-line login-terrain-line--blue-1"
-          />
-          <path
-            d="M-90 735 C170 605 330 825 590 690 C815 575 990 690 1210 605 C1400 530 1515 620 1690 520"
-            className="login-terrain-line login-terrain-line--blue-2"
-          />
-          <path
-            d="M-120 785 C160 650 340 875 620 735 C855 615 1030 745 1250 660 C1435 590 1545 670 1710 575"
-            className="login-terrain-line login-terrain-line--green"
-          />
-          <path
-            d="M-70 560 C160 470 360 530 525 430 C700 325 890 385 1045 315 C1220 235 1420 290 1660 205"
-            className="login-contour-line"
-          />
-          <path
-            d="M-80 605 C190 510 355 585 555 475 C735 375 925 430 1100 355 C1280 280 1455 340 1660 260"
-            className="login-contour-line"
-          />
-          <path
-            d="M-90 650 C190 560 385 625 585 520 C770 425 960 480 1140 410 C1315 345 1480 400 1680 330"
-            className="login-contour-line"
-          />
-        </svg>
-        <div className="login-fields">
-          {Array.from({ length: 6 }, (_, index) => (
-            <span
-              key={index}
-              className={`login-fields__line login-fields__line--${index + 1}`}
-            />
-          ))}
-        </div>
-        <div className="login-map-point login-map-point--water">
-          <span />
-          <small>Recursos hídricos</small>
-        </div>
-        <div className="login-map-point login-map-point--production">
-          <span />
-          <small>Produção</small>
-        </div>
-        <div className="login-map-point login-map-point--territory">
-          <span />
-          <small>Território</small>
-        </div>
-      </div>
+      <AuthBackground />
 
       <header className="login-header">
         <div className="login-brand">

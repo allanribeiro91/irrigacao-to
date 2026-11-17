@@ -17,11 +17,12 @@ import type { CadastroForm } from "./type";
 import { initialForm } from "./type";
 import { criarUsuario } from "./service";
 import { CustomFeedback } from "../../../components/CustomFeedback";
-import { getHttpErrorMessage } from "../../../services/httpClient";
 import { somenteNumeros } from "../../../utils/somenteNumeros";
 import { formatarCpf } from "../../../utils/formatarCpf";
+import { getApiErrorMessage } from "../../../api/client";
 
 import "./index.css";
+import { AuthBackground } from "../../../components/AuthBackground";
 
 function formatarCelular(value: string): string {
   const numeros = somenteNumeros(value).slice(0, 11);
@@ -60,6 +61,7 @@ export function CadastroPage() {
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+
     if (loading) return;
 
     if (form.ds_senha !== form.confirmar_senha) {
@@ -83,10 +85,11 @@ export function CadastroPage() {
         ds_celular: somenteNumeros(form.ds_celular) || null,
         ds_senha: form.ds_senha,
       });
+
       setCadastroConcluido(true);
     } catch (err) {
       setError(
-        getHttpErrorMessage(err, "Não foi possível concluir o cadastro."),
+        getApiErrorMessage(err, "Não foi possível concluir o cadastro."),
       );
     } finally {
       setLoading(false);
@@ -95,35 +98,7 @@ export function CadastroPage() {
 
   return (
     <main className="register-page">
-      <div className="register-background" aria-hidden="true">
-        <div className="register-background__sun" />
-        <svg
-          className="register-background__terrain"
-          viewBox="0 0 1600 900"
-          preserveAspectRatio="none"
-        >
-          <path
-            d="M-80 680 C160 560 320 750 560 630 C800 510 970 660 1190 560 C1380 475 1530 560 1690 470"
-            className="register-terrain-line register-terrain-line--blue"
-          />
-          <path
-            d="M-90 735 C180 600 345 810 605 680 C840 565 1010 700 1235 610 C1420 535 1540 620 1690 530"
-            className="register-terrain-line register-terrain-line--green"
-          />
-          <path
-            d="M-90 560 C170 470 350 540 540 430 C710 335 890 390 1060 320 C1240 245 1430 300 1660 210"
-            className="register-contour-line"
-          />
-          <path
-            d="M-100 610 C180 510 370 590 575 475 C755 375 950 430 1120 360 C1300 290 1470 345 1680 265"
-            className="register-contour-line"
-          />
-          <path
-            d="M-110 660 C190 565 400 630 610 525 C790 435 980 490 1160 420 C1340 355 1500 405 1690 335"
-            className="register-contour-line"
-          />
-        </svg>
-      </div>
+      <AuthBackground />
 
       <header className="register-header">
         <Link className="register-brand" to="/login">

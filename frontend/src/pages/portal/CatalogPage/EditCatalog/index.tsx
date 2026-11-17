@@ -1,9 +1,6 @@
 import { useEffect, useState, type FormEvent } from "react";
-import { useNavigate, useParams } from "react-router";
 import {
-  ArrowLeft,
   CalendarDays,
-  Database,
   FileText,
   Globe2,
   Info,
@@ -14,13 +11,13 @@ import {
   Trash2,
 } from "lucide-react";
 
-import {
-  createCatalog,
-  deleteCatalog,
-  getCatalogById,
-  updateCatalog,
-} from "../service";
-import { getHttpErrorMessage } from "../../../../services/httpClient";
+import { apiGet } from "../../../../api/requests/get";
+import { apiDeleteRequest } from "../../../../api/requests/delete";
+import { apiSave } from "../../../../api/functionts/save";
+import API_PATHS from "../../../../api/paths";
+import { getApiErrorMessage } from "../../../../api/client";
+import { CustomSwal } from "../../../../components/CustomSwal";
+
 import {
   catalogToForm,
   formToCatalogPayload,
@@ -40,60 +37,34 @@ import "./index.css";
 type FieldName = keyof CatalogFormData;
 
 interface EditCatalogProps {
-  catalog?: CatalogData | null;
-  embedded?: boolean;
-  onCancel?: () => void;
+  catalogId?: number | null;
   onSaved?: () => void | Promise<void>;
-  onDeleted?: () => void | Promise<void>;
+  onClose?: () => void;
 }
 
 export function EditCatalog({
-  catalog,
-  embedded = false,
-  onCancel,
+  catalogId = null,
   onSaved,
-  onDeleted,
+  onClose,
 }: EditCatalogProps) {
-  const navigate = useNavigate();
-  const { id } = useParams<{ id: string }>();
-  const catalogId =
-    catalog !== undefined
-      ? (catalog?.CO_SEQ_CATALOGO_DADO ?? null)
-      : id
-        ? Number(id)
-        : null;
-  const isEditing = catalog !== undefined ? catalog !== null : id !== undefined;
+  const isEditing = catalogId !== null;
   const invalidId =
-    isEditing &&
-    (catalogId === null || !Number.isSafeInteger(catalogId) || catalogId <= 0);
+    isEditing && (!Number.isSafeInteger(catalogId) || catalogId <= 0);
 
-  const [form, setForm] = useState<CatalogFormData>(() =>
-    catalog ? catalogToForm(catalog) : { ...initialCatalogForm },
-  );
-  const [loading, setLoading] = useState(isEditing && catalog === undefined);
+  const [form, setForm] = useState<CatalogFormData>({ ...initialCatalogForm });
+  const [dataRaw, setDataRaw] = useState<CatalogFormData | null>(null);
+  const [loading, setLoading] = useState(isEditing && !invalidId);
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  function goBack() {
-    if (embedded && onCancel) {
-      onCancel();
-      return;
-    }
-    navigate("/portal/catalogo");
-  }
 
   function updateField(name: FieldName, value: string) {
     setForm((current) => ({ ...current, [name]: value }));
   }
 
+  // Cada edição consulta os dados do registro diretamente na API.
+  // O CatalogPage já define uma key por catalogId.
   useEffect(() => {
-    if (catalog !== undefined) {
-      // Dados recebidos do pai: não há requisição a executar.
-      // Em aplicações com troca frequente de registros, prefira uma key
-      // no componente pai para reinicializar o formulário por registro.
-      return;
-    }
     if (!isEditing || invalidId || catalogId === null) return;
 
     let active = true;
@@ -101,13 +72,19 @@ export function EditCatalog({
       try {
         setLoading(true);
         setError(null);
-        const result = await getCatalogById(catalogId!);
-        if (active) setForm(catalogToForm(result));
+        const result = await apiGet<CatalogData>(
+          API_PATHS.CATALOG.GET_BY_ID(catalogId!),
+        );
+        if (!active) return;
+        const currentForm = catalogToForm(result);
+        setForm(currentForm);
+        setDataRaw(currentForm);
       } catch (err) {
-        if (active)
+        if (active) {
           setError(
-            getHttpErrorMessage(err, "Não foi possível carregar o cadastro."),
+            getApiErrorMessage(err, "Não foi possível carregar o cadastro."),
           );
+        }
       } finally {
         if (active) setLoading(false);
       }
@@ -116,37 +93,54 @@ export function EditCatalog({
     return () => {
       active = false;
     };
-  }, [catalog, catalogId, invalidId, isEditing]);
-
-  // Os dados embutidos são usados na montagem inicial do formulário.
-  // Para outro registro, o pai deve utilizar key={catalog?.CO_SEQ_CATALOGO_DADO ?? "novo"}.
-  // Caso a edição embutida exija sincronização sem remontagem, faça-a no pai.
+  }, [catalogId, invalidId, isEditing]);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (saving || deleting || loading) return;
+    if (saving || deleting || loading || invalidId) return;
+
     const validationError = validateCatalogForm(form);
     if (validationError) {
       setError(validationError);
-      window.scrollTo({ top: 0, behavior: "smooth" });
       return;
     }
+
+    setSaving(true);
+    setError(null);
     try {
-      setSaving(true);
-      setError(null);
-      const payload = formToCatalogPayload(form);
-      if (isEditing && catalogId !== null && !invalidId) {
-        await updateCatalog(catalogId, payload);
-      } else if (!isEditing) {
-        await createCatalog(payload);
+      const saved = await apiSave({
+        path: API_PATHS.CATALOG.POST,
+        pathUpdate: (id) => API_PATHS.CATALOG.PUT(Number(id)),
+        id: catalogId,
+        formMain: form,
+        dataRaw,
+        updateMethod: "put", // Trocar para "put" se o FastAPI utilizar PUT.
+        preparePayload: (values) => ({ ...formToCatalogPayload(values) }),
+        camposObrigatorios: {
+          NO_CONJUNTO_DADO: "Nome do conjunto de dados",
+          DS_DESCRICAO: "Descrição",
+          CO_TP_DADO: "Tipo de dado",
+          NO_FONTE: "Fonte",
+        },
+      });
+
+      if (!saved) return;
+
+      if (isEditing) {
+        // Mantém os dados atualizados no formulário de edição.
+        setDataRaw({ ...form });
       } else {
-        throw new Error("Identificador do catálogo inválido.");
+        // Limpa o formulário para permitir um novo cadastro.
+        setForm({ ...initialCatalogForm });
+        setDataRaw(null);
       }
-      if (embedded && onSaved) await onSaved();
-      else navigate("/portal/catalogo");
+
+      // Atualiza a listagem do CatalogPage.
+      await onSaved?.();
     } catch (err) {
-      setError(getHttpErrorMessage(err, "Não foi possível salvar o cadastro."));
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      setError(
+        getApiErrorMessage(err, "Não foi possível concluir o salvamento."),
+      );
     } finally {
       setSaving(false);
     }
@@ -155,18 +149,33 @@ export function EditCatalog({
   async function handleDelete() {
     if (!isEditing || catalogId === null || invalidId || saving || deleting)
       return;
-    if (!window.confirm("Deseja realmente inativar este conjunto de dados?"))
-      return;
+
+    const confirmed = await CustomSwal.confirm({
+      title: "Inativar conjunto de dados",
+      text: "Deseja realmente inativar este conjunto de dados?",
+      icon: "warning",
+      confirmButtonText: "Sim, inativar",
+      confirmButtonColor: "#dc2626",
+    });
+    if (!confirmed) return;
+
+    setDeleting(true);
+    setError(null);
     try {
-      setDeleting(true);
-      setError(null);
-      await deleteCatalog(catalogId);
-      if (embedded && onDeleted) await onDeleted();
-      else navigate("/portal/catalogo");
+      await apiDeleteRequest(API_PATHS.CATALOG.DELETE(catalogId));
+      await CustomSwal.alert({
+        title: "Registro inativado",
+        text: "O conjunto de dados foi inativado com sucesso.",
+        icon: "success",
+      });
+      await onSaved?.();
+      onClose?.();
     } catch (err) {
-      setError(
-        getHttpErrorMessage(err, "Não foi possível inativar o cadastro."),
-      );
+      await CustomSwal.alert({
+        title: "Erro ao inativar",
+        text: getApiErrorMessage(err, "Não foi possível inativar o cadastro."),
+        icon: "error",
+      });
     } finally {
       setDeleting(false);
     }
@@ -182,50 +191,16 @@ export function EditCatalog({
       </div>
     );
 
-  if (isEditing && (invalidId || (error && !form.NO_CONJUNTO_DADO)))
+  if (invalidId || (isEditing && error && !dataRaw)) {
     return (
-      <div className="edit-catalog">
-        <button type="button" className="edit-catalog__back" onClick={goBack}>
-          <ArrowLeft size={17} /> Voltar ao catálogo
-        </button>
-        <div className="edit-catalog__alert" role="alert">
-          {error || "Identificador inválido."}
-        </div>
+      <div className="edit-catalog__alert" role="alert">
+        {error || "Identificador inválido."}
       </div>
     );
+  }
 
   return (
-    <div
-      className={
-        embedded ? "edit-catalog edit-catalog--embedded" : "edit-catalog"
-      }
-    >
-      {!embedded && (
-        <header className="edit-catalog__page-header">
-          <button type="button" className="edit-catalog__back" onClick={goBack}>
-            <ArrowLeft size={17} /> Voltar ao catálogo
-          </button>
-          <div className="edit-catalog__page-heading">
-            <div className="edit-catalog__page-icon">
-              <Database size={24} />
-            </div>
-            <div>
-              <span>Governança de dados</span>
-              <h1>
-                {isEditing
-                  ? "Editar conjunto de dados"
-                  : "Novo conjunto de dados"}
-              </h1>
-              <p>
-                {isEditing
-                  ? "Atualize os metadados do conjunto de dados."
-                  : "Cadastre um conjunto de dados no catálogo."}
-              </p>
-            </div>
-          </div>
-        </header>
-      )}
-
+    <div className="edit-catalog edit-catalog--embedded">
       {error && (
         <div className="edit-catalog__alert" role="alert">
           {error}
@@ -544,14 +519,6 @@ export function EditCatalog({
             </button>
           )}
           <div className="edit-catalog__actions-right">
-            <button
-              type="button"
-              className="edit-catalog__button edit-catalog__button--secondary"
-              onClick={goBack}
-              disabled={busy}
-            >
-              Cancelar
-            </button>
             <button
               type="submit"
               className="edit-catalog__button edit-catalog__button--primary"

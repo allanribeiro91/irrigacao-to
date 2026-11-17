@@ -1,8 +1,8 @@
-import httpClient from "../../../services/httpClient";
+import { apiPost } from "../../../api/requests/post";
+import API_PATHS from "../../../api/paths";
+
 import type { LoginRequest, LoginResponse } from "./type";
 
 export async function login(payload: LoginRequest): Promise<LoginResponse> {
-  const response = await httpClient.post<LoginResponse>("/auth/login", payload);
-
-  return response.data;
+  return apiPost<LoginResponse, LoginRequest>(API_PATHS.AUTH.LOGIN, payload);
 }

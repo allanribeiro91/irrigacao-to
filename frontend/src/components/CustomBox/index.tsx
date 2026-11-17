@@ -40,13 +40,9 @@ export default function CustomBox({
   onToggle,
 }: CustomBoxProps) {
   const [internalOpen, setInternalOpen] = useState(defaultOpen);
-
   const contentId = useId();
-
   const isControlled = open !== undefined;
-
   const isOpen = isControlled ? open : internalOpen;
-
   const expanded = alwaysOpen || isOpen;
 
   function handleToggle() {

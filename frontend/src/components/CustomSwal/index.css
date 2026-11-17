@@ -1,0 +1,123 @@
+/* Popup */
+
+.custom-swal__popup {
+  width: min(420px, calc(100vw - 32px));
+  padding: 24px;
+
+  border: 1px solid var(--color-border-subtle, #e2e8f0);
+  border-radius: 14px;
+
+  box-shadow: 0 20px 60px rgba(36, 48, 71, 0.16);
+
+  font-family: inherit;
+}
+
+/* Título */
+
+.custom-swal__title {
+  padding: 0;
+  margin: 12px 0 8px;
+
+  color: var(--color-text-primary, #243047);
+  font-size: 19px;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+/* Mensagem */
+
+.custom-swal__content {
+  margin: 8px 0 16px;
+  padding: 0;
+
+  color: var(--color-text-secondary, #526078);
+  font-size: 13px;
+  line-height: 1.6;
+  white-space: pre-line;
+}
+
+/* Botões */
+
+.custom-swal__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.custom-swal__confirm,
+.custom-swal__cancel {
+  min-width: 100px;
+  min-height: 40px;
+
+  margin: 0;
+  padding: 10px 18px;
+
+  border: 1px solid transparent;
+  border-radius: 7px;
+
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition:
+    background-color 0.2s ease,
+    opacity 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+/* Confirmar */
+
+.custom-swal__confirm {
+  background: var(--custom-swal-confirm-color, #0f33d5);
+  color: #ffffff;
+}
+
+.custom-swal__confirm:hover {
+  filter: brightness(0.92);
+}
+
+/* Cancelar */
+
+.custom-swal__cancel {
+  border-color: var(--color-border, #cbd5e1);
+  background: #ffffff;
+  color: var(--custom-swal-cancel-color, #64748b);
+}
+
+.custom-swal__cancel:hover {
+  background: #f1f5f9;
+}
+
+/* Foco */
+
+.custom-swal__confirm:focus-visible,
+.custom-swal__cancel:focus-visible {
+  outline: 2px solid var(--color-focus, #0f33d5);
+  outline-offset: 3px;
+}
+
+/* Toast */
+
+.custom-swal__toast {
+  border: 1px solid var(--color-border-subtle, #e2e8f0);
+  border-radius: 10px;
+
+  box-shadow: 0 10px 32px rgba(36, 48, 71, 0.14);
+
+  font-family: inherit;
+}
+
+.custom-swal__toast-title {
+  font-size: 13px;
+  font-weight: 650;
+  line-height: 1.5;
+}
+
+/* Barra de progresso */
+
+.custom-swal__progress {
+  background: var(--color-primary, #0f33d5);
+}

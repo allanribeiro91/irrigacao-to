@@ -1,14 +1,10 @@
 import { useEffect, useRef, useState } from "react";
-
 import { ChevronDown, LogOut, UserRound } from "lucide-react";
-
 import { useNavigate } from "react-router";
-
 import { CENTRAL_PATHS } from "../../../../config/paths";
-
 import { useUser } from "../../../../providers/UserProvider/context";
-
-import httpClient from "../../../../services/httpClient";
+import { apiPost } from "../../../../api/requests/post";
+import API_PATHS from "../../../../api/paths";
 
 import "./index.css";
 
@@ -96,7 +92,7 @@ export function SidebarUser({ expanded }: SidebarUserProps) {
     try {
       setLoggingOut(true);
 
-      await httpClient.post("/auth/logout");
+      await apiPost(API_PATHS.AUTH.LOGOUT, {});
     } catch {
       // Limpa a sessão local mesmo se a API não responder.
     } finally {

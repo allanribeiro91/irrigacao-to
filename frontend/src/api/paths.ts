@@ -1,9 +1,9 @@
-const API_ROUTES = {
+export const API_PATHS = {
   CATALOG: {
     LIST: "/catalogo-dados",
     GET_BY_ID: (id: number) => `/catalogo-dados/${id}`,
-    CREATE: "/catalogo-dados",
-    UPDATE: (id: number) => `/catalogo-dados/${id}`,
+    POST: "/catalogo-dados",
+    PUT: (id: number) => `/catalogo-dados/${id}`,
     DELETE: (id: number) => `/catalogo-dados/${id}`,
   },
 
@@ -19,4 +19,4 @@ const API_ROUTES = {
   },
 } as const;
 
-export default API_ROUTES;
+export default API_PATHS;

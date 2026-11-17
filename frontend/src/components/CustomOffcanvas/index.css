@@ -95,7 +95,7 @@
   flex-shrink: 0;
   gap: 16px;
 
-  padding: 22px 24px;
+  padding: 8px 24px;
 
   border-bottom: 1px solid var(--color-border-subtle);
 }
@@ -107,14 +107,14 @@
 .custom-offcanvas__subtitle {
   display: block;
 
-  margin-bottom: 6px;
+  /* margin-bottom: 6px; */
 
   color: var(--color-primary);
 
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
+  font-size: 10px;
+  /* font-weight: 700; */
+  /* letter-spacing: 0.05em; */
+  /* text-transform: uppercase; */
 }
 
 .custom-offcanvas__heading h2 {
@@ -241,4 +241,43 @@
   .custom-offcanvas__overlay {
     transition: none;
   }
+}
+
+/* =========================================================
+   BOTÃO DE EDIÇÃO NO HEADER
+   ========================================================= */
+
+.catalog-page__edit-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 34px;
+  height: 34px;
+
+  padding: 0;
+
+  border: 1px solid transparent;
+  border-radius: 7px;
+
+  background: transparent;
+  color: var(--color-text-muted);
+
+  cursor: pointer;
+
+  transition:
+    background-color 180ms ease,
+    color 180ms ease,
+    border-color 180ms ease;
+}
+
+.catalog-page__edit-button:hover {
+  background: var(--color-primary-subtle);
+  color: var(--color-primary);
+  border-color: var(--color-primary-border);
+}
+
+.catalog-page__edit-button:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
 }
